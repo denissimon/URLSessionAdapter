@@ -9,7 +9,7 @@
 
 import Foundation
 
-enum Method: String {
+public enum Method: String {
     case GET
     case POST
     case PUT

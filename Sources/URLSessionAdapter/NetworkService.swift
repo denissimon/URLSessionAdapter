@@ -9,21 +9,21 @@
 
 import Foundation
 
-struct NetworkError: Error {
+public struct NetworkError: Error {
     let error: Error?
     let code: Int?
 }
 
-class NetworkService {
+open class NetworkService {
        
-    var urlSession: URLSession
+    let urlSession: URLSession
     
     init(urlSession: URLSession = URLSession.shared) {
         self.urlSession = urlSession
     }
     
-    // Request API endpoint
-    func requestEndpoint(_ endpoint: EndpointType, completion: @escaping (Result<Data, NetworkError>) -> Void) {
+    /// Request API endpoint
+    public func requestEndpoint(_ endpoint: EndpointType, completion: @escaping (Result<Data, NetworkError>) -> Void) {
         
         guard let url = URL(string: endpoint.baseURL + endpoint.path) else {
             completion(.failure(NetworkError(error: nil, code: nil)))
@@ -51,8 +51,8 @@ class NetworkService {
         dataTask.resume()
     }
     
-    // Request API endpoint with decoding of results in Decodable
-    func requestEndpoint<T: Decodable>(_ endpoint: EndpointType, type: T.Type, completion: @escaping (Result<T, NetworkError>) -> Void) {
+    /// Request API endpoint with decoding of results in Decodable
+    public func requestEndpoint<T: Decodable>(_ endpoint: EndpointType, type: T.Type, completion: @escaping (Result<T, NetworkError>) -> Void) {
         
         guard let url = URL(string: endpoint.baseURL + endpoint.path) else {
             completion(.failure(NetworkError(error: nil, code: nil)))
@@ -86,11 +86,11 @@ class NetworkService {
         dataTask.resume()
     }
     
-    func fetchFile(url: URL, completion: @escaping (Data?) -> Void) {
+    public func fetchFile(url: URL, completion: @escaping (Data?) -> Void) {
         let request = RequestFactory.request(url: url, method: .GET, params: nil)
         log("\nNetworkService fetchFile: \(request.description)")
      
-        let dataTask = self.urlSession.dataTask(with: request) { (data, response, error) in
+        let dataTask = urlSession.dataTask(with: request) { (data, response, error) in
             if data != nil && error == nil {
                 completion(data!)
                 return
@@ -108,7 +108,7 @@ class NetworkService {
     }
 }
 
-struct ResponseDecodable {
+fileprivate struct ResponseDecodable {
     
     fileprivate var data: Data
     
@@ -127,7 +127,7 @@ struct ResponseDecodable {
     }
 }
 
-enum HTTPHeaderField: String {
+public enum HTTPHeaderField: String {
     case authentication = "Authorization"
     case contentType = "Content-Type"
     case acceptType = "Accept"
@@ -135,7 +135,7 @@ enum HTTPHeaderField: String {
     case string = "String"
 }
 
-enum ContentType: String {
+public enum ContentType: String {
     case json = "application/json"
     case formEncode = "application/x-www-form-urlencoded"
 }

@@ -9,7 +9,7 @@
 
 import Foundation
 
-struct HTTPParams {
+public struct HTTPParams {
     let httpBody: Data?
     let cachePolicy: URLRequest.CachePolicy?
     let timeoutInterval: TimeInterval?
