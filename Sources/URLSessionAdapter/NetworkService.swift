@@ -142,13 +142,13 @@ extension URLSessionDataTask: NetworkCancellable {}
 public enum HTTPHeaderField: String {
     case authentication = "Authorization"
     case contentType = "Content-Type"
-    case acceptType = "Accept"
+    case accept = "Accept"
     case acceptEncoding = "Accept-Encoding"
     case string = "String"
 }
 
 public enum ContentType: String {
-    case json = "application/json"
-    case formEncode = "application/x-www-form-urlencoded"
+    case applicationJson = "application/json"
+    case applicationFormUrlencoded = "application/x-www-form-urlencoded"
 }
 
