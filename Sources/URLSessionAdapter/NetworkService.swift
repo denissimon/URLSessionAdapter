@@ -23,11 +23,11 @@ open class NetworkService {
     }
     
     /// Request API endpoint
-    public func requestEndpoint(_ endpoint: EndpointType, completion: @escaping (Result<Data, NetworkError>) -> Void) {
+    public func requestEndpoint(_ endpoint: EndpointType, completion: @escaping (Result<Data, NetworkError>) -> Void) -> NetworkCancellable? {
         
         guard let url = URL(string: endpoint.baseURL + endpoint.path) else {
             completion(.failure(NetworkError(error: nil, code: nil)))
-            return
+            return nil
         }
         
         let request = RequestFactory.request(url: url, method: endpoint.method, params: endpoint.params)
@@ -49,14 +49,16 @@ open class NetworkService {
         }
         
         dataTask.resume()
+        
+        return dataTask
     }
     
     /// Request API endpoint with decoding of results in Decodable
-    public func requestEndpoint<T: Decodable>(_ endpoint: EndpointType, type: T.Type, completion: @escaping (Result<T, NetworkError>) -> Void) {
+    public func requestEndpoint<T: Decodable>(_ endpoint: EndpointType, type: T.Type, completion: @escaping (Result<T, NetworkError>) -> Void) -> NetworkCancellable? {
         
         guard let url = URL(string: endpoint.baseURL + endpoint.path) else {
             completion(.failure(NetworkError(error: nil, code: nil)))
-            return
+            return nil
         }
         
         let request = RequestFactory.request(url: url, method: endpoint.method, params: endpoint.params)
@@ -84,9 +86,11 @@ open class NetworkService {
         }
 
         dataTask.resume()
+        
+        return dataTask
     }
     
-    public func fetchFile(url: URL, completion: @escaping (Data?) -> Void) {
+    public func fetchFile(url: URL, completion: @escaping (Data?) -> Void) -> NetworkCancellable? {
         let request = RequestFactory.request(url: url, method: .GET, params: nil)
         log("\nNetworkService fetchFile: \(request.description)")
      
@@ -99,6 +103,8 @@ open class NetworkService {
         }
         
         dataTask.resume()
+        
+        return dataTask
     }
     
     private func log(_ str: String) {
@@ -126,6 +132,12 @@ fileprivate struct ResponseDecodable {
         }
     }
 }
+
+public protocol NetworkCancellable {
+    func cancel()
+}
+
+extension URLSessionDataTask: NetworkCancellable {}
 
 public enum HTTPHeaderField: String {
     case authentication = "Authorization"
