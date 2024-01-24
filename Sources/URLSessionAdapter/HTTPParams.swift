@@ -9,8 +9,9 @@
 
 import Foundation
 
+/// httpBody can be accepted as Data or Encodable
 public struct HTTPParams {
-    let httpBody: Data?
+    let httpBody: Any?
     let cachePolicy: URLRequest.CachePolicy?
     let timeoutInterval: TimeInterval?
     let headerValues: [(value: String, forHTTPHeaderField: String)]?

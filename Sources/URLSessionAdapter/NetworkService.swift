@@ -69,8 +69,7 @@ open class NetworkService {
             let status = response?.statusCode
             
             if data != nil && error == nil {
-                let response = ResponseDecodable(data: data!)
-                guard let decoded = response.decode(type) else {
+                guard let decoded = ResponseDecodable.decode(type, data: data!) else {
                     completion(.failure(NetworkError(error: nil, code: status)))
                     return
                 }
@@ -111,25 +110,6 @@ open class NetworkService {
         #if DEBUG
         print(str)
         #endif
-    }
-}
-
-fileprivate struct ResponseDecodable {
-    
-    fileprivate var data: Data
-    
-    init(data: Data) {
-        self.data = data
-    }
-    
-    public func decode<T: Decodable>(_ type: T.Type) -> T? {
-        let jsonDecoder = JSONDecoder()
-        do {
-            let response = try jsonDecoder.decode(T.self, from: data)
-            return response
-        } catch _ {
-            return nil
-        }
     }
 }
 
