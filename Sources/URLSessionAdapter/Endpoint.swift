@@ -23,7 +23,7 @@ public class Endpoint: EndpointType {
     public var path: String
     public var params: HTTPParams?
     
-    init(method: Method, baseURL: String, path: String, params: HTTPParams?) {
+    public init(method: Method, baseURL: String, path: String, params: HTTPParams?) {
         self.method = method
         self.baseURL = baseURL
         self.path = path
