@@ -11,6 +11,7 @@ import Foundation
 
 /// httpBody can be accepted as Data or Encodable
 public struct HTTPParams {
+    
     public var httpBody: Any?
     public var cachePolicy: URLRequest.CachePolicy?
     public var timeoutInterval: TimeInterval?
