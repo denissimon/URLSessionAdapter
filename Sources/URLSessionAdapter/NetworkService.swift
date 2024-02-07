@@ -12,7 +12,7 @@ import Foundation
 public struct NetworkError: Error {
     
     public let error: Error?
-    public let code: Int?
+    public let code: Int? // the response’s HTTP status code
     
     public init(error: Error?, code: Int?) {
         self.error = error
@@ -40,16 +40,16 @@ open class NetworkService {
         
         let dataTask = urlSession.dataTask(with: request) { (data, response, error) in
             let response = response as? HTTPURLResponse
-            let status = response?.statusCode
+            let statusCode = response?.statusCode
             
             if data != nil && error == nil {
                 completion(.success(data!))
                 return
             }
             if error != nil {
-                completion(.failure(NetworkError(error: error!, code: status)))
+                completion(.failure(NetworkError(error: error!, code: statusCode)))
             } else {
-                completion(.failure(NetworkError(error: nil, code: status)))
+                completion(.failure(NetworkError(error: nil, code: statusCode)))
             }
         }
         
@@ -70,11 +70,11 @@ open class NetworkService {
         
         let dataTask = urlSession.dataTask(with: request) { (data, response, error) in
             let response = response as? HTTPURLResponse
-            let status = response?.statusCode
+            let statusCode = response?.statusCode
             
             if data != nil && error == nil {
                 guard let decoded = ResponseDecodable.decode(type, data: data!) else {
-                    completion(.failure(NetworkError(error: nil, code: status)))
+                    completion(.failure(NetworkError(error: nil, code: statusCode)))
                     return
                 }
                 completion(.success(decoded))
@@ -82,9 +82,9 @@ open class NetworkService {
             }
             
             if error != nil {
-                completion(.failure(NetworkError(error: error!, code: status)))
+                completion(.failure(NetworkError(error: error!, code: statusCode)))
             } else {
-                completion(.failure(NetworkError(error: nil, code: status)))
+                completion(.failure(NetworkError(error: nil, code: statusCode)))
             }
         }
 
