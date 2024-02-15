@@ -122,17 +122,3 @@ public protocol NetworkCancellable {
 }
 
 extension URLSessionDataTask: NetworkCancellable {}
-
-public enum HTTPHeader: String {
-    case authentication = "Authorization"
-    case contentType = "Content-Type"
-    case accept = "Accept"
-    case acceptEncoding = "Accept-Encoding"
-    case string = "String"
-}
-
-public enum ContentType: String {
-    case applicationJson = "application/json"
-    case applicationFormUrlencoded = "application/x-www-form-urlencoded"
-}
-
