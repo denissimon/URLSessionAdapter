@@ -10,7 +10,6 @@
 import Foundation
 
 public struct NetworkError: Error {
-    
     public let error: Error?
     public let code: Int? // the response’s HTTP status code
     
