@@ -19,7 +19,14 @@ public struct NetworkError: Error {
     }
 }
 
-open class NetworkService {
+protocol NetworkServiceType {
+    var urlSession: URLSession { get }
+    func request(_ endpoint: EndpointType, completion: @escaping (Result<Data?, NetworkError>) -> Void) -> NetworkCancellable?
+    func request<T: Decodable>(_ endpoint: EndpointType, type: T.Type, completion: @escaping (Result<T, NetworkError>) -> Void) -> NetworkCancellable?
+    func fetchFile(url: URL, completion: @escaping (Data?) -> Void) -> NetworkCancellable?
+}
+
+open class NetworkService: NetworkServiceType {
        
     public private(set) var urlSession: URLSession
     
@@ -27,7 +34,7 @@ open class NetworkService {
         self.urlSession = urlSession
     }
     
-    public func request(_ endpoint: EndpointType, completion: @escaping (Result<Data, NetworkError>) -> Void) -> NetworkCancellable? {
+    public func request(_ endpoint: EndpointType, completion: @escaping (Result<Data?, NetworkError>) -> Void) -> NetworkCancellable? {
         
         guard let url = URL(string: endpoint.baseURL + endpoint.path) else {
             completion(.failure(NetworkError(error: nil, code: nil)))
