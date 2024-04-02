@@ -11,11 +11,13 @@ import Foundation
 
 public struct NetworkError: Error {
     public let error: Error?
-    public let code: Int? // the response’s HTTP status code
+    public let statusCode: Int?
+    public let data: Data?
     
-    public init(error: Error?, code: Int?) {
+    public init(error: Error?, statusCode: Int?, data: Data?) {
         self.error = error
-        self.code = code
+        self.statusCode = statusCode
+        self.data = data
     }
 }
 
