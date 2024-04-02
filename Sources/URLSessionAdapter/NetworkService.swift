@@ -39,7 +39,7 @@ open class NetworkService: NetworkServiceType {
     public func request(_ endpoint: EndpointType, completion: @escaping (Result<Data?, NetworkError>) -> Void) -> NetworkCancellable? {
         
         guard let url = URL(string: endpoint.baseURL + endpoint.path) else {
-            completion(.failure(NetworkError(error: nil, code: nil)))
+            completion(.failure(NetworkError(error: nil, statusCode: nil, data: nil)))
             return nil
         }
         
@@ -47,18 +47,13 @@ open class NetworkService: NetworkServiceType {
         log("\nNetworkService request \(endpoint.method.rawValue), url: \(url)")
         
         let dataTask = urlSession.dataTask(with: request) { (data, response, error) in
-            let response = response as? HTTPURLResponse
-            let statusCode = response?.statusCode
-            
-            if data != nil && error == nil {
-                completion(.success(data!))
+            if error == nil {
+                completion(.success(data))
                 return
             }
-            if error != nil {
-                completion(.failure(NetworkError(error: error!, code: statusCode)))
-            } else {
-                completion(.failure(NetworkError(error: nil, code: statusCode)))
-            }
+            let response = response as? HTTPURLResponse
+            let statusCode = response?.statusCode
+            completion(.failure(NetworkError(error: error, statusCode: statusCode, data: data)))
         }
         
         dataTask.resume()
@@ -69,7 +64,7 @@ open class NetworkService: NetworkServiceType {
     public func request<T: Decodable>(_ endpoint: EndpointType, type: T.Type, completion: @escaping (Result<T, NetworkError>) -> Void) -> NetworkCancellable? {
         
         guard let url = URL(string: endpoint.baseURL + endpoint.path) else {
-            completion(.failure(NetworkError(error: nil, code: nil)))
+            completion(.failure(NetworkError(error: nil, statusCode: nil, data: nil)))
             return nil
         }
         
@@ -80,20 +75,16 @@ open class NetworkService: NetworkServiceType {
             let response = response as? HTTPURLResponse
             let statusCode = response?.statusCode
             
-            if data != nil && error == nil {
-                guard let decoded = ResponseDecodable.decode(type, data: data!) else {
-                    completion(.failure(NetworkError(error: nil, code: statusCode)))
+            if error == nil {
+                guard let data = data, let decoded = ResponseDecodable.decode(type, data: data) else {
+                    completion(.failure(NetworkError(error: nil, statusCode: statusCode, data: data)))
                     return
                 }
                 completion(.success(decoded))
                 return
             }
             
-            if error != nil {
-                completion(.failure(NetworkError(error: error!, code: statusCode)))
-            } else {
-                completion(.failure(NetworkError(error: nil, code: statusCode)))
-            }
+            completion(.failure(NetworkError(error: error, statusCode: statusCode, data: data)))
         }
 
         dataTask.resume()
