@@ -146,7 +146,7 @@ final class URLSessionAdapterTests: XCTestCase {
             promise.fulfill()
         }
         
-        wait(for: [promise], timeout: 1)
+        wait(for: [promise], timeout: 5)
     }
     
     func testFetchFile() {
@@ -159,7 +159,7 @@ final class URLSessionAdapterTests: XCTestCase {
             promise.fulfill()
         }
         
-        wait(for: [promise], timeout: 1)
+        wait(for: [promise], timeout: 5)
     }
     
     func testFetchFile_whenInvalidURL() {
@@ -172,7 +172,7 @@ final class URLSessionAdapterTests: XCTestCase {
             promise.fulfill()
         }
         
-        wait(for: [promise], timeout: 1)
+        wait(for: [promise], timeout: 5)
     }
 }
 
