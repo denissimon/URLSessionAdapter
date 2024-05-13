@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'URLSessionAdapter'
-  s.version      = '1.4.3'
+  s.version      = '1.5.0'
   s.homepage     = 'https://github.com/denissimon/URLSessionAdapter'
   s.authors      = { 'Denis Simon' => 'denis.v.simon@gmail.com' }
   s.summary      = 'A Codable wrapper around URLSession for networking'
