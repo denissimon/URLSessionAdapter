@@ -5,6 +5,8 @@
 
 A Codable wrapper around URLSession for networking.
 
+Supports _data_, _upload_, and _download_ URL session tasks.
+
 Installation
 ------------
 
@@ -22,7 +24,7 @@ Enter Package URL: https://github.com/denissimon/URLSessionAdapter
 To install URLSessionAdapter using [CocoaPods](https://cocoapods.org), add this line to your `Podfile`:
 
 ```ruby
-pod 'URLSessionAdapter', '~> 1.4'
+pod 'URLSessionAdapter', '~> 1.5'
 ```
 
 #### Carthage
@@ -106,25 +108,27 @@ class ActivityRepository {
         self.networkService = networkService
     }
     
-    // Using completion handler
-    func getActivity(id: Int, completionHandler: @escaping (Result<Activity, NetworkError>) -> Void) {
+    func getActivity(id: Int, completionHandler: @escaping (Result<Activity, NetworkError>) -> Void) -> NetworkCancellable? {
         let endpoint = APIEndpoints.getActivity(id: id)
-        networkService.request(endpoint, type: Activity.self) { result in
+        let networkTask = networkService.request(endpoint, type: Activity.self) { result in
             completionHandler(result)
         }
+        return networkTask
     }
     
-    func createActivity(_ activity: Activity, completionHandler: @escaping (Result<Data?, NetworkError>) -> Void) {
+    func createActivity(_ activity: Activity, completionHandler: @escaping (Result<Data?, NetworkError>) -> Void) -> NetworkCancellable? {
         let endpoint = APIEndpoints.createActivity(activity)
-        networkService.request(endpoint) { result in
+        let networkTask = networkService.request(endpoint) { result in
             completionHandler(result)
         }
+        return networkTask
     }
     
-    // Using async/await
+    // Using async/await with 'continuation':
+    
     func getActivity(id: Int) async -> Result<Activity, NetworkError> {
         await withCheckedContinuation { continuation in
-            getActivity(id: id) { result in
+            let _ = getActivity(id: id) { result in
                 continuation.resume(returning: result)
             }
         }
@@ -132,7 +136,7 @@ class ActivityRepository {
     
     func createActivity(_ activity: Activity) async -> Result<Data?, NetworkError> {
         await withCheckedContinuation { continuation in
-            createActivity(activity) { result in
+            let _ = createActivity(activity) { result in
                 continuation.resume(returning: result)
             }
         }
@@ -145,35 +149,57 @@ class ActivityRepository {
 ```swift
 let activityRepository = ActivityRepository(networkService: NetworkService())
 
-Task.detached {
+activityRepository.getActivity(id: 1) { result in // -> Result<Activity, NetworkError>
+    ...
+}
+
+// The server returns the id of the created activity
+activityRepository.createActivity(activity) { result in // -> Result<Data?, NetworkError>
+    if let data = try? result.get() {
+        if let createdActivityId = Int(String(data: data, encoding: .utf8) ?? "") {
+            ...
+        }
+    }
+}
+
+// Using async/await with 'continuation':
+
+Task {
     let result = await activityRepository.getActivity(id: 1) // -> Result<Activity, NetworkError>
     ...
 }
 
-Task.detached {
+Task {
     // The server returns the id of the created activity
     let result = await activityRepository.createActivity(activity) // -> Result<Data?, NetworkError>
-    if let resultData = try? result.get() {
-        if let createdActivityId = Int(String(data: resultData, encoding: .utf8) ?? "") {
+    if let data = try? result.get() {
+        if let createdActivityId = Int(String(data: data, encoding: .utf8) ?? "") {
             ...
         }
     }
 }
 ```
 
-More usage examples can be found in [URLSessionAdapterTests.swift](https://github.com/denissimon/URLSessionAdapter/blob/main/Tests/URLSessionAdapterTests/URLSessionAdapterTests.swift), as well as in [iOS-MVVM-Clean-Architecture](https://github.com/denissimon/iOS-MVVM-Clean-Architecture) and [Cryptocurrency-Info](https://github.com/denissimon/Cryptocurrency-Info) where this adapter was used.
+More usage examples can be found in [URLSessionAdapterTests.swift](https://github.com/denissimon/URLSessionAdapter/blob/main/Tests/URLSessionAdapterTests/URLSessionAdapterTests.swift) and [iOS-MVVM-Clean-Architecture](https://github.com/denissimon/iOS-MVVM-Clean-Architecture) where this adapter was used.
 
 ### Public methods
 
 ```swift
-func request(_ endpoint: EndpointType, completion: @escaping (Result<Data?, NetworkError>) -> Void) -> NetworkCancellable?
-func request<T: Decodable>(_ endpoint: EndpointType, type: T.Type, completion: @escaping (Result<T, NetworkError>) -> Void) -> NetworkCancellable?
+func request(_ endpoint: EndpointType, uploadTask: Bool, completion: @escaping (Result<Data?, NetworkError>) -> Void) -> NetworkCancellable?
+func request<T: Decodable>(_ endpoint: EndpointType, type: T.Type, uploadTask: Bool, completion: @escaping (Result<T, NetworkError>) -> Void) -> NetworkCancellable?
 func fetchFile(url: URL, completion: @escaping (Data?) -> Void) -> NetworkCancellable?
+func downloadFile(url: URL, to localUrl: URL, completion: @escaping (Result<Bool, NetworkError>) -> Void) -> NetworkCancellable?
 
-func requestWithStatusCode(_ endpoint: EndpointType, completion: @escaping (Result<(result: Data?, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
-func requestWithStatusCode<T: Decodable>(_ endpoint: EndpointType, type: T.Type, completion: @escaping (Result<(result: T, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
+func requestWithStatusCode(_ endpoint: EndpointType, uploadTask: Bool, completion: @escaping (Result<(result: Data?, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
+func requestWithStatusCode<T: Decodable>(_ endpoint: EndpointType, type: T.Type, uploadTask: Bool, completion: @escaping (Result<(result: T, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
 func fetchFileWithStatusCode(url: URL, completion: @escaping ((result: Data?, statusCode: Int?)) -> Void) -> NetworkCancellable?
+func downloadFileWithStatusCode(url: URL, to localUrl: URL, completion: @escaping (Result<(result: Bool, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
 ```
+
+Requirements
+------------
+
+iOS 12.0+, macOS 10.13.0+, tvOS 12.0+, watchOS 4.0+
 
 License
 -------
