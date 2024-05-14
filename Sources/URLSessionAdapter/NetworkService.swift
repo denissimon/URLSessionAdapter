@@ -14,7 +14,7 @@ public struct NetworkError: Error {
     public let statusCode: Int?
     public let data: Data?
     
-    public init(error: Error?, statusCode: Int?, data: Data?) {
+    public init(error: Error? = nil, statusCode: Int? = nil, data: Data? = nil) {
         self.error = error
         self.statusCode = statusCode
         self.data = data
@@ -53,7 +53,7 @@ open class NetworkService: NetworkServiceType {
     public func request(_ endpoint: EndpointType, uploadTask: Bool, completion: @escaping (Result<Data?, NetworkError>) -> Void) -> NetworkCancellable? {
         
         guard let url = URL(string: endpoint.baseURL + endpoint.path) else {
-            completion(.failure(NetworkError(error: nil, statusCode: nil, data: nil)))
+            completion(.failure(NetworkError()))
             return nil
         }
         
@@ -79,7 +79,7 @@ open class NetworkService: NetworkServiceType {
             return dataTask
         case true:
             guard let httpBody = request.httpBody, ["POST", "PUT", "PATCH"].contains(request.httpMethod) else {
-                completion(.failure(NetworkError(error: nil, statusCode: nil, data: nil)))
+                completion(.failure(NetworkError()))
                 return nil
             }
             log(msg)
@@ -104,7 +104,7 @@ open class NetworkService: NetworkServiceType {
     public func request<T: Decodable>(_ endpoint: EndpointType, type: T.Type, uploadTask: Bool = false, completion: @escaping (Result<T, NetworkError>) -> Void) -> NetworkCancellable? {
         
         guard let url = URL(string: endpoint.baseURL + endpoint.path) else {
-            completion(.failure(NetworkError(error: nil, statusCode: nil, data: nil)))
+            completion(.failure(NetworkError()))
             return nil
         }
         
@@ -121,7 +121,7 @@ open class NetworkService: NetworkServiceType {
                 let statusCode = response?.statusCode
                 if error == nil {
                     guard let data = data, let decoded = ResponseDecodable.decode(type, data: data) else {
-                        completion(.failure(NetworkError(error: nil, statusCode: statusCode, data: data)))
+                        completion(.failure(NetworkError(statusCode: statusCode, data: data)))
                         return
                     }
                     completion(.success(decoded))
@@ -134,7 +134,7 @@ open class NetworkService: NetworkServiceType {
             return dataTask
         case true:
             guard let httpBody = request.httpBody, ["POST", "PUT", "PATCH"].contains(request.httpMethod) else {
-                completion(.failure(NetworkError(error: nil, statusCode: nil, data: nil)))
+                completion(.failure(NetworkError()))
                 return nil
             }
             log(msg)
@@ -145,7 +145,7 @@ open class NetworkService: NetworkServiceType {
                 let statusCode = response?.statusCode
                 if error == nil {
                     guard let data = data, let decoded = ResponseDecodable.decode(type, data: data) else {
-                        completion(.failure(NetworkError(error: nil, statusCode: statusCode, data: data)))
+                        completion(.failure(NetworkError(statusCode: statusCode, data: data)))
                         return
                     }
                     completion(.success(decoded))
@@ -187,7 +187,7 @@ open class NetworkService: NetworkServiceType {
             let response = response as? HTTPURLResponse
             let statusCode = response?.statusCode
             guard let tempLocalUrl = tempLocalUrl, error == nil else {
-                completion(.failure(NetworkError(error: error, statusCode: statusCode, data: nil)))
+                completion(.failure(NetworkError(error: error, statusCode: statusCode)))
                 return
             }
             do {
@@ -196,7 +196,7 @@ open class NetworkService: NetworkServiceType {
                 }
                 completion(.success(true))
             } catch {
-                completion(.failure(NetworkError(error: error, statusCode: statusCode, data: nil)))
+                completion(.failure(NetworkError(error: error, statusCode: statusCode)))
             }
         }
         
@@ -209,7 +209,7 @@ open class NetworkService: NetworkServiceType {
     public func requestWithStatusCode(_ endpoint: EndpointType, uploadTask: Bool = false, completion: @escaping (Result<(result: Data?, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable? {
         
         guard let url = URL(string: endpoint.baseURL + endpoint.path) else {
-            completion(.failure(NetworkError(error: nil, statusCode: nil, data: nil)))
+            completion(.failure(NetworkError()))
             return nil
         }
         
@@ -237,7 +237,7 @@ open class NetworkService: NetworkServiceType {
             return dataTask
         case true:
             guard let httpBody = request.httpBody, ["POST", "PUT", "PATCH"].contains(request.httpMethod) else {
-                completion(.failure(NetworkError(error: nil, statusCode: nil, data: nil)))
+                completion(.failure(NetworkError()))
                 return nil
             }
             log(msg)
@@ -264,7 +264,7 @@ open class NetworkService: NetworkServiceType {
     public func requestWithStatusCode<T: Decodable>(_ endpoint: EndpointType, type: T.Type, uploadTask: Bool = false, completion: @escaping (Result<(result: T, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable? {
         
         guard let url = URL(string: endpoint.baseURL + endpoint.path) else {
-            completion(.failure(NetworkError(error: nil, statusCode: nil, data: nil)))
+            completion(.failure(NetworkError()))
             return nil
         }
         
@@ -282,7 +282,7 @@ open class NetworkService: NetworkServiceType {
                 
                 if error == nil {
                     guard let data = data, let decoded = ResponseDecodable.decode(type, data: data) else {
-                        completion(.failure(NetworkError(error: nil, statusCode: statusCode, data: data)))
+                        completion(.failure(NetworkError(statusCode: statusCode, data: data)))
                         return
                     }
                     completion(.success((decoded, statusCode)))
@@ -296,7 +296,7 @@ open class NetworkService: NetworkServiceType {
             return dataTask
         case true:
             guard let httpBody = request.httpBody, ["POST", "PUT", "PATCH"].contains(request.httpMethod) else {
-                completion(.failure(NetworkError(error: nil, statusCode: nil, data: nil)))
+                completion(.failure(NetworkError()))
                 return nil
             }
             log(msg)
@@ -308,7 +308,7 @@ open class NetworkService: NetworkServiceType {
                 
                 if error == nil {
                     guard let data = data, let decoded = ResponseDecodable.decode(type, data: data) else {
-                        completion(.failure(NetworkError(error: nil, statusCode: statusCode, data: data)))
+                        completion(.failure(NetworkError(statusCode: statusCode, data: data)))
                         return
                     }
                     completion(.success((decoded, statusCode)))
@@ -355,7 +355,7 @@ open class NetworkService: NetworkServiceType {
             let response = response as? HTTPURLResponse
             let statusCode = response?.statusCode
             guard let tempLocalUrl = tempLocalUrl, error == nil else {
-                completion(.failure(NetworkError(error: error, statusCode: statusCode, data: nil)))
+                completion(.failure(NetworkError(error: error, statusCode: statusCode)))
                 return
             }
             do {
@@ -364,7 +364,7 @@ open class NetworkService: NetworkServiceType {
                 }
                 completion(.success((true, statusCode)))
             } catch {
-                completion(.failure(NetworkError(error: error, statusCode: statusCode, data: nil)))
+                completion(.failure(NetworkError(error: error, statusCode: statusCode)))
             }
         }
         

@@ -42,7 +42,7 @@ final class URLSessionAdapterTests: XCTestCase {
         
         func request<T: Decodable>(_ endpoint: EndpointType, type: T.Type, uploadTask: Bool = false, completion: @escaping (Result<T, NetworkError>) -> Void) -> NetworkCancellable? {
             guard let decoded = ResponseDecodable.decode(type, data: responseData) else {
-                completion(.failure(NetworkError(error: nil, statusCode: nil, data: nil)))
+                completion(.failure(NetworkError()))
                 return nil
             }
             completion(.success(decoded))
@@ -66,7 +66,7 @@ final class URLSessionAdapterTests: XCTestCase {
 
         func requestWithStatusCode<T: Decodable>(_ endpoint: EndpointType, type: T.Type, uploadTask: Bool = false, completion: @escaping (Result<(result: T, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable? {
             guard let decoded = ResponseDecodable.decode(type, data: responseData) else {
-                completion(.failure(NetworkError(error: nil, statusCode: nil, data: nil)))
+                completion(.failure(NetworkError()))
                 return nil
             }
             completion(.success((decoded, 200)))
