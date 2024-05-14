@@ -172,7 +172,7 @@ Task {
 }
 ```
 
-More usage examples can be found in [URLSessionAdapterTests.swift](https://github.com/denissimon/URLSessionAdapter/blob/main/Tests/URLSessionAdapterTests/URLSessionAdapterTests.swift) and [iOS-MVVM-Clean-Architecture](https://github.com/denissimon/iOS-MVVM-Clean-Architecture) where this adapter was used.
+More usage examples can be found in [tests](https://github.com/denissimon/URLSessionAdapter/tree/main/Tests/URLSessionAdapterTests) and [iOS-MVVM-Clean-Architecture](https://github.com/denissimon/iOS-MVVM-Clean-Architecture) where this adapter was used.
 
 ### Public methods
 
