@@ -1,5 +1,5 @@
 //
-//  URLSessionAdapterTests.swift
+//  FlickrAPITests.swift
 //  https://github.com/denissimon/URLSessionAdapter
 //
 //  Created by Denis Simon on 31/03/2024.
@@ -10,7 +10,7 @@
 import XCTest
 @testable import URLSessionAdapter
 
-final class URLSessionAdapterTests: XCTestCase {
+final class FlickrAPITests: XCTestCase {
     
     // FlickrAPI tests (from https://github.com/denissimon/iOS-MVVM-Clean-Architecture/)
     
@@ -86,7 +86,7 @@ final class URLSessionAdapterTests: XCTestCase {
     
     func testSearch() {
         let endpoint = FlickrAPI.search(ImageQuery(query: "random"))
-        let expectedData = URLSessionAdapterTests.searchResultJsonStub.data(using: .utf8)!
+        let expectedData = FlickrAPITests.searchResultJsonStub.data(using: .utf8)!
         let networkServiceMock = NetworkServiceMock(responseData: expectedData)
         
         var resultData: Data? = Data()
@@ -107,7 +107,7 @@ final class URLSessionAdapterTests: XCTestCase {
     
     func testGetHotTags() {
         let endpoint = FlickrAPI.getHotTags()
-        let networkServiceMock = NetworkServiceMock(responseData: URLSessionAdapterTests.getHotTagsResultJsonStub.data(using: .utf8)!)
+        let networkServiceMock = NetworkServiceMock(responseData: FlickrAPITests.getHotTagsResultJsonStub.data(using: .utf8)!)
         let _ = networkServiceMock.request(endpoint, type: Tags.self) { result in
             switch result {
             case .success(let tags):
