@@ -50,7 +50,7 @@ open class NetworkService: NetworkServiceType {
     }
     
     /// - Parameter uploadTask: To support uploading files, including background uploads. In other POST/PUT cases (e.g. with a json as httpBody), uploadTask can be false and dataTask will be used.
-    public func request(_ endpoint: EndpointType, uploadTask: Bool, completion: @escaping (Result<Data?, NetworkError>) -> Void) -> NetworkCancellable? {
+    public func request(_ endpoint: EndpointType, uploadTask: Bool = false, completion: @escaping (Result<Data?, NetworkError>) -> Void) -> NetworkCancellable? {
         
         guard let url = URL(string: endpoint.baseURL + endpoint.path) else {
             completion(.failure(NetworkError()))
