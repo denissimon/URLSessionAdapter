@@ -49,8 +49,6 @@ struct Activity: Codable {
     let id: Int?
     let name: String
     let description: String
-    var requiredByDate: Date?
-    var completedDate: Date?
 }
 ```
 
@@ -65,17 +63,12 @@ struct APIEndpoints {
     static let apiKey = "api_key"
     
     static func getActivity(id: Int) -> EndpointType {
-        let path = "/activities/\(id)/?api_key=\(APIEndpoints.apiKey)"
-        
-        let params = HTTPParams(timeoutInterval: 10.0, headerValues:[
-        (value: "application/json", forHTTPHeaderField: "Accept"),
-        (value: "application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")])
-        
+        let path = "/activities/\(id)/?api_key=\(APIEndpoints.apiKey)"        
         return Endpoint(
             method: .GET,
             baseURL: APIEndpoints.baseURL,
             path: path,
-            params: params)
+            params: nil)
     }
     
     static func createActivity(_ activity: Activity) -> EndpointType {
@@ -83,7 +76,6 @@ struct APIEndpoints {
         
         let activityData = activity.encode()
         let params = HTTPParams(httpBody: activityData, headerValues:[
-        (value: "text/plain", forHTTPHeaderField: "Accept"),
         (value: "application/json", forHTTPHeaderField: "Content-Type")])
         
         return Endpoint(
