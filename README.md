@@ -102,18 +102,16 @@ class ActivityRepository {
     
     func getActivity(id: Int, completionHandler: @escaping (Result<Activity, NetworkError>) -> Void) -> NetworkCancellable? {
         let endpoint = APIEndpoints.getActivity(id: id)
-        let networkTask = networkService.request(endpoint, type: Activity.self) { result in
+        return networkService.request(endpoint, type: Activity.self) { result in
             completionHandler(result)
         }
-        return networkTask
     }
     
     func createActivity(_ activity: Activity, completionHandler: @escaping (Result<Data?, NetworkError>) -> Void) -> NetworkCancellable? {
         let endpoint = APIEndpoints.createActivity(activity)
-        let networkTask = networkService.request(endpoint) { result in
+        return networkService.request(endpoint) { result in
             completionHandler(result)
         }
-        return networkTask
     }
     
     // Using async/await with 'continuation':
