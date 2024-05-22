@@ -21,7 +21,21 @@ public struct NetworkError: Error {
     }
 }
 
-public protocol NetworkServiceType {
+public protocol NetworkServiceAsyncAwaitType {
+    var urlSession: URLSession { get }
+    
+    func request(_ endpoint: EndpointType, uploadTask: Bool) async throws -> Data
+    func request<T: Decodable>(_ endpoint: EndpointType, type: T.Type, uploadTask: Bool) async throws -> T
+    func fetchFile(url: URL) async throws -> Data?
+    func downloadFile(url: URL, to localUrl: URL) async throws -> Bool
+    
+    func requestWithStatusCode(_ endpoint: EndpointType, uploadTask: Bool) async throws -> (result: Data, statusCode: Int?)
+    func requestWithStatusCode<T: Decodable>(_ endpoint: EndpointType, type: T.Type, uploadTask: Bool) async throws -> (result: T, statusCode: Int?)
+    func fetchFileWithStatusCode(url: URL) async throws -> (result: Data?, statusCode: Int?)
+    func downloadFileWithStatusCode(url: URL, to localUrl: URL) async throws -> (result: Bool, statusCode: Int?)
+}
+
+public protocol NetworkServiceCallbacksType {
     var urlSession: URLSession { get }
     
     func request(_ endpoint: EndpointType, uploadTask: Bool, completion: @escaping (Result<Data?, NetworkError>) -> Void) -> NetworkCancellable?
@@ -35,6 +49,9 @@ public protocol NetworkServiceType {
     func downloadFileWithStatusCode(url: URL, to localUrl: URL, completion: @escaping (Result<(result: Bool, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
 }
 
+public typealias NetworkServiceType = NetworkServiceAsyncAwaitType & NetworkServiceCallbacksType
+
+@available(macOS 12.0, *)
 open class NetworkService: NetworkServiceType {
        
     public private(set) var urlSession: URLSession
@@ -48,6 +65,245 @@ open class NetworkService: NetworkServiceType {
         print(str)
         #endif
     }
+    
+    // MARK: - async/await API
+    
+    /// - Parameter uploadTask: To support uploading files, including background uploads. In other POST/PUT cases (e.g. with a json as httpBody), uploadTask can be false and dataTask will be used.
+    public func request(_ endpoint: EndpointType, uploadTask: Bool = false) async throws -> Data {
+        guard let url = URL(string: endpoint.baseURL + endpoint.path) else {
+            throw NetworkError()
+        }
+        
+        var request = RequestFactory.request(url: url, method: endpoint.method, params: endpoint.params)
+        var msg = "\nNetworkService request \(endpoint.method.rawValue)"
+        if uploadTask { msg += ", uploadTask"}
+        msg += ", url: \(url)"
+        
+        switch uploadTask {
+        case false:
+            log(msg)
+            let (responseData, _) = try await urlSession.data(
+                for: request
+            )
+            return responseData
+        case true:
+            guard let httpBody = request.httpBody, ["POST", "PUT"].contains(request.httpMethod) else {
+                throw NetworkError()
+            }
+            log(msg)
+            request.httpBody = nil
+            let (responseData, _) = try await urlSession.upload(
+                for: request,
+                from: httpBody
+            )
+            return responseData
+        }
+    }
+    
+    /// - Parameter uploadTask: To support uploading files, including background uploads. In other POST/PUT cases (e.g. with a json as httpBody), uploadTask can be false and dataTask will be used.
+    public func request<T: Decodable>(_ endpoint: EndpointType, type: T.Type, uploadTask: Bool = false) async throws -> T {
+        guard let url = URL(string: endpoint.baseURL + endpoint.path) else {
+            throw NetworkError()
+        }
+        
+        var request = RequestFactory.request(url: url, method: endpoint.method, params: endpoint.params)
+        var msg = "\nNetworkService request<T: Decodable> \(endpoint.method.rawValue)"
+        if uploadTask { msg += ", uploadTask"}
+        msg += ", url: \(url)"
+        
+        switch uploadTask {
+        case false:
+            log(msg)
+            let (responseData, response) = try await urlSession.data(
+                for: request
+            )
+            
+            let httpResponse = response as? HTTPURLResponse
+            let statusCode = httpResponse?.statusCode
+            
+            guard let decoded = ResponseDecodable.decode(type, data: responseData) else {
+                throw NetworkError(statusCode: statusCode, data: responseData)
+            }
+            
+            return decoded
+        case true:
+            guard let httpBody = request.httpBody, ["POST", "PUT"].contains(request.httpMethod) else {
+                throw NetworkError()
+            }
+            log(msg)
+            request.httpBody = nil
+            let (responseData, response) = try await urlSession.upload(
+                for: request,
+                from: httpBody
+            )
+            
+            let httpResponse = response as? HTTPURLResponse
+            let statusCode = httpResponse?.statusCode
+            
+            guard let decoded = ResponseDecodable.decode(type, data: responseData) else {
+                throw NetworkError(statusCode: statusCode, data: responseData)
+            }
+            
+            return decoded
+        }
+    }
+    
+    /// Fetches a file into memory
+    public func fetchFile(url: URL) async throws -> Data? {
+        log("\nNetworkService fetchFile: \(url)")
+        
+        let (responseData, _) = try await urlSession.data(from: url)
+        
+        guard !responseData.isEmpty else {
+            return nil
+        }
+        return responseData
+    }
+    
+    /// Downloads a file to disk, and supports background downloads.
+    /// - Returns:.success(true), if successful
+    public func downloadFile(url: URL, to localUrl: URL) async throws -> Bool {
+        log("\nNetworkService downloadFile, url: \(url), to: \(localUrl)")
+        
+        let (tempLocalUrl, response) = try await urlSession.download(from: url)
+        
+        let httpResponse = response as? HTTPURLResponse
+        let statusCode = httpResponse?.statusCode
+        
+        do {
+            if !FileManager().fileExists(atPath: localUrl.path) {
+                try FileManager.default.copyItem(at: tempLocalUrl, to: localUrl)
+            }
+            return true
+        } catch {
+            throw NetworkError(statusCode: statusCode)
+        }
+    }
+    
+    /// - Parameter uploadTask: To support uploading files, including background uploads. In other POST/PUT cases (e.g. with a json as httpBody), uploadTask can be false and dataTask will be used.
+    public func requestWithStatusCode(_ endpoint: EndpointType, uploadTask: Bool = false) async throws -> (result: Data, statusCode: Int?) {
+        guard let url = URL(string: endpoint.baseURL + endpoint.path) else {
+            throw NetworkError()
+        }
+        
+        var request = RequestFactory.request(url: url, method: endpoint.method, params: endpoint.params)
+        var msg = "\nNetworkService requestWithStatusCode \(endpoint.method.rawValue)"
+        if uploadTask { msg += ", uploadTask"}
+        msg += ", url: \(url)"
+        
+        switch uploadTask {
+        case false:
+            log(msg)
+            let (responseData, response) = try await urlSession.data(
+                for: request
+            )
+            
+            let httpResponse = response as? HTTPURLResponse
+            let statusCode = httpResponse?.statusCode
+            
+            return (responseData, statusCode)
+        case true:
+            guard let httpBody = request.httpBody, ["POST", "PUT"].contains(request.httpMethod) else {
+                throw NetworkError()
+            }
+            log(msg)
+            request.httpBody = nil
+            let (responseData, response) = try await urlSession.upload(
+                for: request,
+                from: httpBody
+            )
+            
+            let httpResponse = response as? HTTPURLResponse
+            let statusCode = httpResponse?.statusCode
+            
+            return (responseData, statusCode)
+        }
+    }
+    
+    /// - Parameter uploadTask: To support uploading files, including background uploads. In other POST/PUT cases (e.g. with a json as httpBody), uploadTask can be false and dataTask will be used.
+    public func requestWithStatusCode<T: Decodable>(_ endpoint: EndpointType, type: T.Type, uploadTask: Bool = false) async throws -> (result: T, statusCode: Int?) {
+        guard let url = URL(string: endpoint.baseURL + endpoint.path) else {
+            throw NetworkError()
+        }
+        
+        var request = RequestFactory.request(url: url, method: endpoint.method, params: endpoint.params)
+        var msg = "\nNetworkService requestWithStatusCode<T: Decodable> \(endpoint.method.rawValue)"
+        if uploadTask { msg += ", uploadTask"}
+        msg += ", url: \(url)"
+        
+        switch uploadTask {
+        case false:
+            log(msg)
+            let (responseData, response) = try await urlSession.data(
+                for: request
+            )
+            
+            let httpResponse = response as? HTTPURLResponse
+            let statusCode = httpResponse?.statusCode
+            
+            guard let decoded = ResponseDecodable.decode(type, data: responseData) else {
+                throw NetworkError(statusCode: statusCode, data: responseData)
+            }
+            
+            return (decoded, statusCode)
+        case true:
+            guard let httpBody = request.httpBody, ["POST", "PUT"].contains(request.httpMethod) else {
+                throw NetworkError()
+            }
+            log(msg)
+            request.httpBody = nil
+            let (responseData, response) = try await urlSession.upload(
+                for: request,
+                from: httpBody
+            )
+            
+            let httpResponse = response as? HTTPURLResponse
+            let statusCode = httpResponse?.statusCode
+            
+            guard let decoded = ResponseDecodable.decode(type, data: responseData) else {
+                throw NetworkError(statusCode: statusCode, data: responseData)
+            }
+            
+            return (decoded, statusCode)
+        }
+    }
+    
+    /// Fetches a file into memory
+    public func fetchFileWithStatusCode(url: URL) async throws -> (result: Data?, statusCode: Int?) {
+        log("\nNetworkService fetchFileWithStatusCode: \(url)")
+        
+        let (responseData, response) = try await urlSession.data(from: url)
+        let httpResponse = response as? HTTPURLResponse
+        let statusCode = httpResponse?.statusCode
+        
+        guard !responseData.isEmpty else {
+            return (nil, statusCode)
+        }
+        
+        return (responseData, statusCode)
+    }
+    
+    /// Downloads a file to disk, and supports background downloads.
+    /// - Returns:.success(true), if successful
+    public func downloadFileWithStatusCode(url: URL, to localUrl: URL) async throws -> (result: Bool, statusCode: Int?) {
+        log("\nNetworkService downloadFileWithStatusCode, url: \(url), to: \(localUrl)")
+        
+        let (tempLocalUrl, response) = try await urlSession.download(from: url)
+        
+        let httpResponse = response as? HTTPURLResponse
+        let statusCode = httpResponse?.statusCode
+        
+        do {
+            if !FileManager().fileExists(atPath: localUrl.path) {
+                try FileManager.default.copyItem(at: tempLocalUrl, to: localUrl)
+            }
+            return (true, statusCode)
+        } catch {
+            throw NetworkError(statusCode: statusCode)
+        }
+    }
+    
+    // MARK: - callbacks API
     
     /// - Parameter uploadTask: To support uploading files, including background uploads. In other POST/PUT cases (e.g. with a json as httpBody), uploadTask can be false and dataTask will be used.
     public func request(_ endpoint: EndpointType, uploadTask: Bool = false, completion: @escaping (Result<Data?, NetworkError>) -> Void) -> NetworkCancellable? {
