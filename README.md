@@ -3,7 +3,7 @@
 [![Swift](https://img.shields.io/badge/Swift-5-orange.svg?style=flat)](https://swift.org)
 [![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20macOS%20%7C%20watchOS%20%7C%20tvOS-lightgrey.svg)](https://developer.apple.com/swift/)
 
-A Codable wrapper around URLSession for networking.
+A Codable wrapper around URLSession for networking. Includes both APIs: async/await and callbacks. 
 
 Supports _data_, _upload_, and _download_ URL session tasks.
 
@@ -24,7 +24,7 @@ Enter Package URL: https://github.com/denissimon/URLSessionAdapter
 To install URLSessionAdapter using [CocoaPods](https://cocoapods.org), add this line to your `Podfile`:
 
 ```ruby
-pod 'URLSessionAdapter', '~> 1.5'
+pod 'URLSessionAdapter', '~> 1.6'
 ```
 
 #### Carthage
@@ -100,36 +100,14 @@ class ActivityRepository {
         self.networkService = networkService
     }
     
-    func getActivity(id: Int, completionHandler: @escaping (Result<Activity, NetworkError>) -> Void) -> NetworkCancellable? {
+    func getActivity(id: Int) async throws -> Activity
         let endpoint = APIEndpoints.getActivity(id: id)
-        return networkService.request(endpoint, type: Activity.self) { result in
-            completionHandler(result)
-        }
+        return try await networkService.request(endpoint, type: Activity.self)
     }
     
-    func createActivity(_ activity: Activity, completionHandler: @escaping (Result<Data?, NetworkError>) -> Void) -> NetworkCancellable? {
+    func createActivity(_ activity: Activity) async throws -> Data? {
         let endpoint = APIEndpoints.createActivity(activity)
-        return networkService.request(endpoint) { result in
-            completionHandler(result)
-        }
-    }
-    
-    // Using async/await with 'continuation':
-    
-    func getActivity(id: Int) async -> Result<Activity, NetworkError> {
-        await withCheckedContinuation { continuation in
-            let _ = getActivity(id: id) { result in
-                continuation.resume(returning: result)
-            }
-        }
-    }
-    
-    func createActivity(_ activity: Activity) async -> Result<Data?, NetworkError> {
-        await withCheckedContinuation { continuation in
-            let _ = createActivity(activity) { result in
-                continuation.resume(returning: result)
-            }
-        }
+        return try await networkService.request(endpoint)
     }
 }
 ```
@@ -139,34 +117,41 @@ class ActivityRepository {
 ```swift
 let activityRepository = ActivityRepository(networkService: NetworkService())
 
-activityRepository.getActivity(id: 1) { result in // -> Result<Activity, NetworkError>
-    ...
-}
-
-// The server returns the id of the created activity
-activityRepository.createActivity(activity) { result in // -> Result<Data?, NetworkError>
-    if let data = try? result.get() {
-        if let createdActivityId = Int(String(data: data, encoding: .utf8) ?? "") {
-            ...
-        }
+Task {
+    do {
+        let activity = try await activityRepository.getActivity(id: 1) // -> Activity
+        ...
+    } catch {
+        ...
     }
 }
 
-// Using async/await with 'continuation':
-
 Task {
-    let result = await activityRepository.getActivity(id: 1) // -> Result<Activity, NetworkError>
+    do {
+        // The server returns the id of the created activity
+        if let data = try await activityRepository.createActivity(activity) { // -> Data?
+            if let createdActivityId = Int(String(data: data, encoding: .utf8) ?? "") {
+                ...
+            }
+        }
+    } catch {
+        ...
+    }
+}
+```
+
+```swift
+let networkService = NetworkService()
+
+// To fetch a file:
+let data = try await networkService.fetchFile(url: url)
+guard let image = UIImage(data: data) else {
     ...
 }
 
-Task {
-    // The server returns the id of the created activity
-    let result = await activityRepository.createActivity(activity) // -> Result<Data?, NetworkError>
-    if let data = try? result.get() {
-        if let createdActivityId = Int(String(data: data, encoding: .utf8) ?? "") {
-            ...
-        }
-    }
+// To download a file:
+guard try await networkService.downloadFile(url: url, to: localUrl) else {
+    ...
 }
 ```
 
@@ -175,6 +160,20 @@ More usage examples can be found in [tests](https://github.com/denissimon/URLSes
 ### Public methods
 
 ```swift
+// async/await API
+
+func request(_ endpoint: EndpointType, uploadTask: Bool) async throws -> Data
+func request<T: Decodable>(_ endpoint: EndpointType, type: T.Type, uploadTask: Bool) async throws -> T
+func fetchFile(url: URL) async throws -> Data?
+func downloadFile(url: URL, to localUrl: URL) async throws -> Bool
+
+func requestWithStatusCode(_ endpoint: EndpointType, uploadTask: Bool) async throws -> (result: Data, statusCode: Int?)
+func requestWithStatusCode<T: Decodable>(_ endpoint: EndpointType, type: T.Type, uploadTask: Bool) async throws -> (result: T, statusCode: Int?)
+func fetchFileWithStatusCode(url: URL) async throws -> (result: Data?, statusCode: Int?)
+func downloadFileWithStatusCode(url: URL, to localUrl: URL) async throws -> (result: Bool, statusCode: Int?)
+
+// callbacks API
+
 func request(_ endpoint: EndpointType, uploadTask: Bool, completion: @escaping (Result<Data?, NetworkError>) -> Void) -> NetworkCancellable?
 func request<T: Decodable>(_ endpoint: EndpointType, type: T.Type, uploadTask: Bool, completion: @escaping (Result<T, NetworkError>) -> Void) -> NetworkCancellable?
 func fetchFile(url: URL, completion: @escaping (Data?) -> Void) -> NetworkCancellable?
@@ -189,7 +188,7 @@ func downloadFileWithStatusCode(url: URL, to localUrl: URL, completion: @escapin
 Requirements
 ------------
 
-iOS 12.0+, macOS 10.13.0+, tvOS 12.0+, watchOS 4.0+
+iOS 15.0+, macOS 10.15.0+, tvOS 15.0+, watchOS 8.0+
 
 License
 -------
