@@ -188,7 +188,7 @@ func downloadFileWithStatusCode(url: URL, to localUrl: URL, completion: @escapin
 Requirements
 ------------
 
-iOS 15.0+, macOS 10.15.0+, tvOS 15.0+, watchOS 8.0+
+iOS 15.0+, macOS 12.0+, tvOS 15.0+, watchOS 8.0+
 
 License
 -------
