@@ -170,6 +170,10 @@ open class NetworkService: NetworkServiceType {
         let httpResponse = response as? HTTPURLResponse
         let statusCode = httpResponse?.statusCode
         
+        if statusCode == 404 {
+            throw NetworkError(statusCode: statusCode)
+        }
+        
         do {
             if !FileManager().fileExists(atPath: localUrl.path) {
                 try FileManager.default.copyItem(at: tempLocalUrl, to: localUrl)
@@ -292,6 +296,10 @@ open class NetworkService: NetworkServiceType {
         
         let httpResponse = response as? HTTPURLResponse
         let statusCode = httpResponse?.statusCode
+        
+        if statusCode == 404 {
+            throw NetworkError(statusCode: statusCode)
+        }
         
         do {
             if !FileManager().fileExists(atPath: localUrl.path) {
