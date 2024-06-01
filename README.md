@@ -155,6 +155,35 @@ guard try await networkService.downloadFile(url: url, to: localUrl) else {
 }
 ```
 
+```swift
+// To get a result with status code:
+let endpoint = JSONPlaceholderAPI.createPost(post)
+let result = try await networkService.requestWithStatusCode(endpoint, type: Post.self)
+let post = result.data // Returned Post from the server
+let statusCode = result.statusCode // Returned 201 status code from the server
+```
+
+```swift
+// Any 400-599 status code returned by the server throws a NetworkError:
+do {
+    // There is no activity with id 1000, the server will return status code 404
+    let activity = try await activityRepository.getActivity(id: 1000)
+    ...
+} catch {
+    switch error {
+    case is NetworkError:
+        let networkError = error as! NetworkError
+        let errorDescription = networkError.error?.localizedDescription
+        let errorStatusCode = networkError.statusCode // 404
+        let errorDataStr = String(data: networkError.data ?? Data(), encoding: .utf8)!
+        ...
+    default:
+        // Handling other network errors
+        ...
+    }
+}
+```
+        
 More usage examples can be found in [tests](https://github.com/denissimon/URLSessionAdapter/tree/main/Tests/URLSessionAdapterTests) and [iOS-MVVM-Clean-Architecture](https://github.com/denissimon/iOS-MVVM-Clean-Architecture) where this adapter was used.
 
 ### Public methods
@@ -176,12 +205,12 @@ func downloadFileWithStatusCode(url: URL, to localUrl: URL) async throws -> (res
 
 func request(_ endpoint: EndpointType, uploadTask: Bool, completion: @escaping (Result<Data?, NetworkError>) -> Void) -> NetworkCancellable?
 func request<T: Decodable>(_ endpoint: EndpointType, type: T.Type, uploadTask: Bool, completion: @escaping (Result<T, NetworkError>) -> Void) -> NetworkCancellable?
-func fetchFile(url: URL, completion: @escaping (Data?) -> Void) -> NetworkCancellable?
+func fetchFile(url: URL, completion: @escaping (Result<Data?, NetworkError>) -> Void) -> NetworkCancellable?
 func downloadFile(url: URL, to localUrl: URL, completion: @escaping (Result<Bool, NetworkError>) -> Void) -> NetworkCancellable?
 
 func requestWithStatusCode(_ endpoint: EndpointType, uploadTask: Bool, completion: @escaping (Result<(result: Data?, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
 func requestWithStatusCode<T: Decodable>(_ endpoint: EndpointType, type: T.Type, uploadTask: Bool, completion: @escaping (Result<(result: T, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
-func fetchFileWithStatusCode(url: URL, completion: @escaping ((result: Data?, statusCode: Int?)) -> Void) -> NetworkCancellable?
+func fetchFileWithStatusCode(url: URL, completion: @escaping (Result<(result: Data?, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
 func downloadFileWithStatusCode(url: URL, to localUrl: URL, completion: @escaping (Result<(result: Bool, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
 ```
 
