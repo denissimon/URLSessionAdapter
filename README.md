@@ -159,8 +159,8 @@ guard try await networkService.downloadFile(url: url, to: localUrl) else {
 // To get a result with status code:
 let endpoint = JSONPlaceholderAPI.createPost(post)
 let result = try await networkService.requestWithStatusCode(endpoint, type: Post.self)
-let post = result.data // Returned Post from the server
-let statusCode = result.statusCode // Returned 201 status code from the server
+let post = result.data // Returned created Post
+let statusCode = result.statusCode // Returned 201 status code
 ```
 
 ```swift
