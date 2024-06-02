@@ -158,16 +158,16 @@ guard try await networkService.downloadFile(url: url, to: localUrl) else {
 ```swift
 // To get a result with status code:
 let endpoint = JSONPlaceholderAPI.createPost(post)
-let result = try await networkService.requestWithStatusCode(endpoint, type: Post.self)
-let post = result.data // Returned created Post
-let statusCode = result.statusCode // Returned 201 status code
+let response = try await networkService.requestWithStatusCode(endpoint, type: Post.self)
+let post = response.result // Returned created Post
+let statusCode = response.statusCode // Returned 201 status code
 ```
 
 ```swift
-// Any 400-599 status code returned by the server throws a NetworkError:
+// By default, any 400-599 status code returned by the server throws a NetworkError:
 do {
-    // There is no activity with id 1000, the server will return status code 404
-    let activity = try await activityRepository.getActivity(id: 1000)
+    // The server will return status code 404
+    let response = try await networkService.requestWithStatusCode(endpoint)
     ...
 } catch {
     switch error {
@@ -182,6 +182,27 @@ do {
         ...
     }
 }
+
+// Optionally, this automatic validation can be disabled globally:
+networkService.autoValidation = false
+do {
+    // The server will return status code 404
+    let response = try await networkService.requestWithStatusCode(endpoint)
+    let statusCode = response.statusCode // 404
+    let resultStr = String(data: response.result ?? Data(), encoding: .utf8)!
+} catch {
+    ...
+}
+
+// Or this automatic validation can be disabled for a given request:
+do {
+    // The server will return status code 404
+    let response = try await networkService.requestWithStatusCode(endpoint, config: RequestConfig(autoValidation: false))
+    let statusCode = response.statusCode // 404
+    let resultStr = String(data: response.result ?? Data(), encoding: .utf8)!
+} catch {
+    ...
+}
 ```
         
 More usage examples can be found in [tests](https://github.com/denissimon/URLSessionAdapter/tree/main/Tests/URLSessionAdapterTests) and [iOS-MVVM-Clean-Architecture](https://github.com/denissimon/iOS-MVVM-Clean-Architecture) where this adapter was used.
@@ -191,27 +212,27 @@ More usage examples can be found in [tests](https://github.com/denissimon/URLSes
 ```swift
 // async/await API
 
-func request(_ endpoint: EndpointType, uploadTask: Bool) async throws -> Data
-func request<T: Decodable>(_ endpoint: EndpointType, type: T.Type, uploadTask: Bool) async throws -> T
-func fetchFile(url: URL) async throws -> Data?
-func downloadFile(url: URL, to localUrl: URL) async throws -> Bool
+func request(_ endpoint: EndpointType, config: RequestConfig?) async throws -> Data
+func request<T: Decodable>(_ endpoint: EndpointType, type: T.Type, config: RequestConfig?) async throws -> T
+func fetchFile(url: URL, config: RequestConfig?) async throws -> Data?
+func downloadFile(url: URL, to localUrl: URL, config: RequestConfig?) async throws -> Bool
 
-func requestWithStatusCode(_ endpoint: EndpointType, uploadTask: Bool) async throws -> (result: Data, statusCode: Int?)
-func requestWithStatusCode<T: Decodable>(_ endpoint: EndpointType, type: T.Type, uploadTask: Bool) async throws -> (result: T, statusCode: Int?)
-func fetchFileWithStatusCode(url: URL) async throws -> (result: Data?, statusCode: Int?)
-func downloadFileWithStatusCode(url: URL, to localUrl: URL) async throws -> (result: Bool, statusCode: Int?)
+func requestWithStatusCode(_ endpoint: EndpointType, config: RequestConfig?) async throws -> (result: Data, statusCode: Int?)
+func requestWithStatusCode<T: Decodable>(_ endpoint: EndpointType, type: T.Type, config: RequestConfig?) async throws -> (result: T, statusCode: Int?)
+func fetchFileWithStatusCode(url: URL, config: RequestConfig?) async throws -> (result: Data?, statusCode: Int?)
+func downloadFileWithStatusCode(url: URL, to localUrl: URL, config: RequestConfig?) async throws -> (result: Bool, statusCode: Int?)
 
 // callbacks API
 
-func request(_ endpoint: EndpointType, uploadTask: Bool, completion: @escaping (Result<Data?, NetworkError>) -> Void) -> NetworkCancellable?
-func request<T: Decodable>(_ endpoint: EndpointType, type: T.Type, uploadTask: Bool, completion: @escaping (Result<T, NetworkError>) -> Void) -> NetworkCancellable?
-func fetchFile(url: URL, completion: @escaping (Result<Data?, NetworkError>) -> Void) -> NetworkCancellable?
-func downloadFile(url: URL, to localUrl: URL, completion: @escaping (Result<Bool, NetworkError>) -> Void) -> NetworkCancellable?
+func request(_ endpoint: EndpointType, config: RequestConfig?, completion: @escaping (Result<Data?, NetworkError>) -> Void) -> NetworkCancellable?
+func request<T: Decodable>(_ endpoint: EndpointType, type: T.Type, config: RequestConfig?, completion: @escaping (Result<T, NetworkError>) -> Void) -> NetworkCancellable?
+func fetchFile(url: URL, config: RequestConfig?, completion: @escaping (Result<Data?, NetworkError>) -> Void) -> NetworkCancellable?
+func downloadFile(url: URL, to localUrl: URL, config: RequestConfig?, completion: @escaping (Result<Bool, NetworkError>) -> Void) -> NetworkCancellable?
 
-func requestWithStatusCode(_ endpoint: EndpointType, uploadTask: Bool, completion: @escaping (Result<(result: Data?, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
-func requestWithStatusCode<T: Decodable>(_ endpoint: EndpointType, type: T.Type, uploadTask: Bool, completion: @escaping (Result<(result: T, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
-func fetchFileWithStatusCode(url: URL, completion: @escaping (Result<(result: Data?, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
-func downloadFileWithStatusCode(url: URL, to localUrl: URL, completion: @escaping (Result<(result: Bool, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
+func requestWithStatusCode(_ endpoint: EndpointType, config: RequestConfig?, completion: @escaping (Result<(result: Data?, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
+func requestWithStatusCode<T: Decodable>(_ endpoint: EndpointType, type: T.Type, config: RequestConfig?, completion: @escaping (Result<(result: T, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
+func fetchFileWithStatusCode(url: URL, config: RequestConfig?, completion: @escaping (Result<(result: Data?, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
+func downloadFileWithStatusCode(url: URL, to localUrl: URL, config: RequestConfig?, completion: @escaping (Result<(result: Bool, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
 ```
 
 Requirements
