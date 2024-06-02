@@ -153,6 +153,11 @@ guard let image = UIImage(data: data) else {
 guard try await networkService.downloadFile(url: url, to: localUrl) else {
     ...
 }
+
+// To upload a file:
+let endpoint = JSONPlaceholderAPI.uploadFile(file)
+let config = RequestConfig(uploadTask: true)
+let response = try await networkService.request(endpoint, config: config)
 ```
 
 ```swift
@@ -197,7 +202,8 @@ do {
 // Or this automatic validation can be disabled for a given request:
 do {
     // The server will return status code 404
-    let response = try await networkService.requestWithStatusCode(endpoint, config: RequestConfig(autoValidation: false))
+    let config = RequestConfig(autoValidation: false)
+    let response = try await networkService.requestWithStatusCode(endpoint, config: config)
     let statusCode = response.statusCode // 404
     let resultStr = String(data: response.result ?? Data(), encoding: .utf8)!
 } catch {
