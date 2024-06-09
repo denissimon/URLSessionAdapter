@@ -119,15 +119,12 @@ final class NetworkServiceTests: XCTestCase {
             XCTAssertEqual(returnedPost.userId, 1)
             promise.fulfill()
         } catch {
-            switch error {
-            case is NetworkError:
+            if error is NetworkError {
                 let networkError = error as! NetworkError
                 let errorDescription = networkError.error?.localizedDescription
                 let errorStatusCode = networkError.statusCode
                 let errorDataStr = String(data: networkError.data ?? Data(), encoding: .utf8)!
                 print("testRequestGet: \(String(describing: errorDescription)), \(String(describing: errorStatusCode)), \(errorDataStr)")
-            default:
-                break
             }
         }
         
@@ -142,8 +139,7 @@ final class NetworkServiceTests: XCTestCase {
             let _ = try await networkService.request(JSONPlaceholderAPI.getPost(id: 102), type: Post.self)
             XCTFail() // shouldn't happen
         } catch {
-            switch error {
-            case is NetworkError:
+            if error is NetworkError {
                 let networkError = error as! NetworkError
                 let errorDescription = networkError.error?.localizedDescription
                 let errorStatusCode = networkError.statusCode
@@ -154,8 +150,6 @@ final class NetworkServiceTests: XCTestCase {
                 XCTAssertEqual(errorStatusCode, 404)
                 XCTAssertEqual(errorDataStr, "{}")
                 promise.fulfill()
-            default:
-                break
             }
         }
         
@@ -186,8 +180,7 @@ final class NetworkServiceTests: XCTestCase {
             let _ = try await networkService.requestWithStatusCode(JSONPlaceholderAPI.getPost(id: 102))
             XCTFail() // shouldn't happen
         } catch {
-            switch error {
-            case is NetworkError:
+            if error is NetworkError {
                 let networkError = error as! NetworkError
                 let errorDescription = networkError.error?.localizedDescription
                 let errorStatusCode = networkError.statusCode
@@ -198,8 +191,6 @@ final class NetworkServiceTests: XCTestCase {
                 XCTAssertEqual(errorStatusCode, 404)
                 XCTAssertEqual(errorDataStr, "{}")
                 promise.fulfill()
-            default:
-                break
             }
         }
         
@@ -255,15 +246,12 @@ final class NetworkServiceTests: XCTestCase {
             XCTAssertEqual(returnedPost.userId, 2)
             promise.fulfill()
         } catch {
-            switch error {
-            case is NetworkError:
+            if error is NetworkError {
                 let networkError = error as! NetworkError
                 let errorDescription = networkError.error?.localizedDescription
                 let errorStatusCode = networkError.statusCode
                 let errorDataStr = String(data: networkError.data ?? Data(), encoding: .utf8)!
                 print("testRequestPost: \(String(describing: errorDescription)), \(String(describing: errorStatusCode)), \(errorDataStr)")
-            default:
-                break
             }
         }
         
@@ -460,15 +448,12 @@ final class NetworkServiceTests: XCTestCase {
                 promise.fulfill()
             }
         } catch {
-            switch error {
-            case is NetworkError:
+            if error is NetworkError {
                 let networkError = error as! NetworkError
                 let errorDescription = networkError.error?.localizedDescription
                 let errorStatusCode = networkError.statusCode
                 let errorDataStr = String(data: networkError.data ?? Data(), encoding: .utf8)!
                 print("testDownloadFile: \(String(describing: errorDescription)), \(String(describing: errorStatusCode)), \(errorDataStr)")
-            default:
-                break
             }
         }
         
@@ -498,15 +483,12 @@ final class NetworkServiceTests: XCTestCase {
                 promise.fulfill()
             }
         } catch {
-            switch error {
-            case is NetworkError:
+            if error is NetworkError {
                 let networkError = error as! NetworkError
                 let errorDescription = networkError.error?.localizedDescription
                 let errorStatusCode = networkError.statusCode
                 let errorDataStr = String(data: networkError.data ?? Data(), encoding: .utf8)!
                 print("testDownloadFileWithStatusCode: \(String(describing: errorDescription)), \(String(describing: errorStatusCode)), \(errorDataStr)")
-            default:
-                break
             }
         }
         
@@ -525,13 +507,10 @@ final class NetworkServiceTests: XCTestCase {
             let _ = try await networkService.downloadFileWithStatusCode(url: url, to: destinationUrl)
             XCTFail() // shouldn't happen
         } catch {
-            switch error {
-            case is NetworkError:
+            if error is NetworkError {
                 let networkError = error as! NetworkError
                 XCTAssertEqual(networkError.statusCode, 404)
                 promise.fulfill()
-            default:
-                break
             }
         }
         
