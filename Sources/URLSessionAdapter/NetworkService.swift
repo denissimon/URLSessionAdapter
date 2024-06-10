@@ -31,6 +31,10 @@ public struct RequestConfig {
     }
 }
 
+@available(iOS 15.0, *)
+@available(macOS 12.0, *)
+@available(tvOS 15.0, *)
+@available(watchOS 8.0, *)
 public protocol NetworkServiceAsyncAwaitType {
     var urlSession: URLSession { get }
     
@@ -59,9 +63,16 @@ public protocol NetworkServiceCallbacksType {
     func downloadFileWithStatusCode(url: URL, to localUrl: URL, config: RequestConfig?, completion: @escaping (Result<(result: Bool, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
 }
 
+@available(iOS 15.0, *)
+@available(macOS 12.0, *)
+@available(tvOS 15.0, *)
+@available(watchOS 8.0, *)
 public typealias NetworkServiceType = NetworkServiceAsyncAwaitType & NetworkServiceCallbacksType
 
+@available(iOS 15.0, *)
 @available(macOS 12.0, *)
+@available(tvOS 15.0, *)
+@available(watchOS 8.0, *)
 open class NetworkService: NetworkServiceType {
        
     public private(set) var urlSession: URLSession
