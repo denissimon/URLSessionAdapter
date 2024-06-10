@@ -168,6 +168,8 @@ let post = response.result // Returned created Post
 let statusCode = response.statusCode // Returned 201 status code
 ```
 
+**Validation:**
+
 ```swift
 // By default, any 400-599 status code returned by the server throws a NetworkError:
 do {
@@ -175,15 +177,14 @@ do {
     let response = try await networkService.requestWithStatusCode(endpoint)
     ...
 } catch {
-    switch error {
-    case is NetworkError:
+    if error is NetworkError {
         let networkError = error as! NetworkError
         let errorDescription = networkError.error?.localizedDescription
         let errorStatusCode = networkError.statusCode // 404
         let errorDataStr = String(data: networkError.data ?? Data(), encoding: .utf8)!
         ...
-    default:
-        // Handling other network errors
+    } else {
+        // Handling other errors
         ...
     }
 }
