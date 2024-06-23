@@ -115,7 +115,8 @@ class ActivityRepository {
 **API calls:**
 
 ```swift
-let activityRepository = ActivityRepository(networkService: NetworkService())
+let networkService = NetworkService(urlSession: URLSession.shared)
+let activityRepository = ActivityRepository(networkService: networkService)
 
 Task {
     do {
@@ -141,8 +142,6 @@ Task {
 ```
 
 ```swift
-let networkService = NetworkService()
-
 // To fetch a file:
 let data = try await networkService.fetchFile(url: url)
 guard let image = UIImage(data: data) else {
