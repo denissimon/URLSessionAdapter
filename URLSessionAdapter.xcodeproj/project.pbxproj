@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		412AE7B42C5C3ECA00C56A1C /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412AE7B32C5C3ECA00C56A1C /* HTTPMethod.swift */; };
+		412AE7B52C5C3ECA00C56A1C /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412AE7B32C5C3ECA00C56A1C /* HTTPMethod.swift */; };
+		412AE7B62C5C3ECA00C56A1C /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412AE7B32C5C3ECA00C56A1C /* HTTPMethod.swift */; };
+		412AE7B72C5C3ECA00C56A1C /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412AE7B32C5C3ECA00C56A1C /* HTTPMethod.swift */; };
 		4142F4822B60E643000339D7 /* URLSessionAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = 4142F4812B60E643000339D7 /* URLSessionAdapter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4142F4832B60E643000339D7 /* URLSessionAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = 4142F4812B60E643000339D7 /* URLSessionAdapter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4142F4842B60E643000339D7 /* URLSessionAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = 4142F4812B60E643000339D7 /* URLSessionAdapter.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -34,6 +38,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		412AE7B32C5C3ECA00C56A1C /* HTTPMethod.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HTTPMethod.swift; path = Sources/URLSessionAdapter/HTTPMethod.swift; sourceTree = "<group>"; };
 		4142F4512B60E33A000339D7 /* URLSessionAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = URLSessionAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4142F45E2B60E369000339D7 /* URLSessionAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = URLSessionAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4142F46A2B60E392000339D7 /* URLSessionAdapter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = URLSessionAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -100,10 +105,11 @@
 		4142F47D2B60E59B000339D7 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				4142F4A82B61AC38000339D7 /* EncodeDecode.swift */,
-				4142F4882B60E661000339D7 /* Endpoint.swift */,
-				4142F4892B60E661000339D7 /* HTTPParams.swift */,
 				4142F4862B60E660000339D7 /* NetworkService.swift */,
+				4142F4882B60E661000339D7 /* Endpoint.swift */,
+				412AE7B32C5C3ECA00C56A1C /* HTTPMethod.swift */,
+				4142F4892B60E661000339D7 /* HTTPParams.swift */,
+				4142F4A82B61AC38000339D7 /* EncodeDecode.swift */,
 				4142F4872B60E661000339D7 /* RequestFactory.swift */,
 				4142F4812B60E643000339D7 /* URLSessionAdapter.h */,
 			);
@@ -306,6 +312,7 @@
 			files = (
 				4142F48E2B60E661000339D7 /* RequestFactory.swift in Sources */,
 				4142F4A92B61AC39000339D7 /* EncodeDecode.swift in Sources */,
+				412AE7B42C5C3ECA00C56A1C /* HTTPMethod.swift in Sources */,
 				4142F4922B60E661000339D7 /* Endpoint.swift in Sources */,
 				4142F48A2B60E661000339D7 /* NetworkService.swift in Sources */,
 				4142F4962B60E661000339D7 /* HTTPParams.swift in Sources */,
@@ -318,6 +325,7 @@
 			files = (
 				4142F48F2B60E661000339D7 /* RequestFactory.swift in Sources */,
 				4142F4AA2B61AC39000339D7 /* EncodeDecode.swift in Sources */,
+				412AE7B52C5C3ECA00C56A1C /* HTTPMethod.swift in Sources */,
 				4142F4932B60E661000339D7 /* Endpoint.swift in Sources */,
 				4142F48B2B60E661000339D7 /* NetworkService.swift in Sources */,
 				4142F4972B60E661000339D7 /* HTTPParams.swift in Sources */,
@@ -330,6 +338,7 @@
 			files = (
 				4142F4902B60E661000339D7 /* RequestFactory.swift in Sources */,
 				4142F4AB2B61AC39000339D7 /* EncodeDecode.swift in Sources */,
+				412AE7B62C5C3ECA00C56A1C /* HTTPMethod.swift in Sources */,
 				4142F4942B60E661000339D7 /* Endpoint.swift in Sources */,
 				4142F48C2B60E661000339D7 /* NetworkService.swift in Sources */,
 				4142F4982B60E661000339D7 /* HTTPParams.swift in Sources */,
@@ -342,6 +351,7 @@
 			files = (
 				4142F4912B60E661000339D7 /* RequestFactory.swift in Sources */,
 				4142F4AC2B61AC39000339D7 /* EncodeDecode.swift in Sources */,
+				412AE7B72C5C3ECA00C56A1C /* HTTPMethod.swift in Sources */,
 				4142F4952B60E661000339D7 /* Endpoint.swift in Sources */,
 				4142F48D2B60E661000339D7 /* NetworkService.swift in Sources */,
 				4142F4992B60E661000339D7 /* HTTPParams.swift in Sources */,
