@@ -482,7 +482,7 @@ final class NetworkServiceTests: XCTestCase {
         
         let networkService = NetworkServiceTests.networkService
         do {
-            let _ = try await networkService.fetchFileWithStatusCode(url: URL(string: "https://farm1.staticflickr.com/server/id1_secret1_m.jpg")!)
+            let _ = try await networkService.fetchFileWithStatusCode(url: URL(string: "https://jsonplaceholder.typicode.com/some_image.jpg")!)
             XCTFail() // shouldn't happen
         } catch {
             let networkError = error as! NetworkError
@@ -499,8 +499,8 @@ final class NetworkServiceTests: XCTestCase {
         let networkService = NetworkServiceTests.networkService
         XCTAssertEqual(networkService.autoValidation, true)
         do {
-            let response = try await networkService.fetchFileWithStatusCode(url: URL(string: "https://farm1.staticflickr.com/server/id1_secret1_m.jpg")!, config: RequestConfig(autoValidation: false))
-            XCTAssertEqual(response.result, nil)
+            let response = try await networkService.fetchFileWithStatusCode(url: URL(string: "https://jsonplaceholder.typicode.com/some_image.jpg")!, config: RequestConfig(autoValidation: false))
+            XCTAssertEqual(response.result, "{}".data(using: .utf8))
             XCTAssertEqual(response.statusCode, 404)
             promise.fulfill()
         } catch {
@@ -515,8 +515,8 @@ final class NetworkServiceTests: XCTestCase {
         
         let networkService = NetworkService(autoValidation: false)
         do {
-            let response = try await networkService.fetchFileWithStatusCode(url: URL(string: "https://farm1.staticflickr.com/server/id1_secret1_m.jpg")!)
-            XCTAssertEqual(response.result, nil)
+            let response = try await networkService.fetchFileWithStatusCode(url: URL(string: "https://jsonplaceholder.typicode.com/some_image.jpg")!)
+            XCTAssertEqual(response.result, "{}".data(using: .utf8))
             XCTAssertEqual(response.statusCode, 404)
             promise.fulfill()
         } catch {
@@ -594,7 +594,7 @@ final class NetworkServiceTests: XCTestCase {
     func testDownloadFileWithStatusCode_whenInvalidURL_asyncAwaitAPI() async throws {
         let promise = expectation(description: "testDownloadFileWithStatusCode_whenInvalidURL")
         
-        let url = URL(string: "https://farm1.staticflickr.com/server/id1_secret1_m.jpg")!
+        let url = URL(string: "https://jsonplaceholder.typicode.com/some_image.jpg")!
         let documentsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let destinationUrl = documentsUrl.appendingPathComponent(url.lastPathComponent)
         
@@ -1034,7 +1034,7 @@ final class NetworkServiceTests: XCTestCase {
         let promise = expectation(description: "testFetchFileWithStatusCode_whenInvalidURL")
         
         let networkService = NetworkServiceTests.networkService
-        let _ = networkService.fetchFileWithStatusCode(url: URL(string: "https://farm1.staticflickr.com/server/id1_secret1_m.jpg")!) { response in
+        let _ = networkService.fetchFileWithStatusCode(url: URL(string: "https://jsonplaceholder.typicode.com/some_image.jpg")!) { response in
             switch response {
             case .success(_):
                 break
@@ -1046,7 +1046,7 @@ final class NetworkServiceTests: XCTestCase {
                 
                 XCTAssertEqual(errorDescription, nil)
                 XCTAssertEqual(errorStatusCode, 404)
-                XCTAssertEqual(errorDataStr, "")
+                XCTAssertEqual(errorDataStr, "{}")
                 promise.fulfill()
             }
         }
@@ -1059,10 +1059,10 @@ final class NetworkServiceTests: XCTestCase {
         
         let networkService = NetworkServiceTests.networkService
         XCTAssertEqual(networkService.autoValidation, true)
-        let _ = networkService.fetchFileWithStatusCode(url: URL(string: "https://farm1.staticflickr.com/server/id1_secret1_m.jpg")!, config: RequestConfig(autoValidation: false)) { response in
+        let _ = networkService.fetchFileWithStatusCode(url: URL(string: "https://jsonplaceholder.typicode.com/some_image.jpg")!, config: RequestConfig(autoValidation: false)) { response in
             switch response {
             case .success(let result):
-                XCTAssertEqual(result.result, nil)
+                XCTAssertEqual(result.result, "{}".data(using: .utf8))
                 XCTAssertEqual(result.statusCode, 404)
                 promise.fulfill()
             case .failure(_):
@@ -1077,10 +1077,10 @@ final class NetworkServiceTests: XCTestCase {
         let promise = expectation(description: "testFetchFileWithStatusCode_whenInvalidURL_andDisabledGlobalAutoValidation")
         
         let networkService = NetworkService(autoValidation: false)
-        let _ = networkService.fetchFileWithStatusCode(url: URL(string: "https://farm1.staticflickr.com/server/id1_secret1_m.jpg")!) { response in
+        let _ = networkService.fetchFileWithStatusCode(url: URL(string: "https://jsonplaceholder.typicode.com/some_image.jpg")!) { response in
             switch response {
             case .success(let result):
-                XCTAssertEqual(result.result, nil)
+                XCTAssertEqual(result.result, "{}".data(using: .utf8))
                 XCTAssertEqual(result.statusCode, 404)
                 promise.fulfill()
             case .failure(_):
@@ -1155,7 +1155,7 @@ final class NetworkServiceTests: XCTestCase {
     func testDownloadFileWithStatusCode_whenInvalidURL_callbacksAPI() {
         let promise = expectation(description: "testDownloadFileWithStatusCode_whenInvalidURL")
         
-        let url = URL(string: "https://farm1.staticflickr.com/server/id1_secret1_m.jpg")!
+        let url = URL(string: "https://jsonplaceholder.typicode.com/some_image.jpg")!
         let documentsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let destinationUrl = documentsUrl.appendingPathComponent(url.lastPathComponent)
         
