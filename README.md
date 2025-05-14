@@ -5,7 +5,10 @@
 
 A Codable wrapper around URLSession for networking. Includes both APIs: async/await and callbacks. 
 
-Supports _data_, _upload_, and _download_ URL session tasks.
+Supports:
+* _data_, _upload_, and _download_ URL session tasks
+* HTTP methods: GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS, CONNECT, TRACE, QUERY
+* Automatic validation: global or per request based on the received status code
 
 Installation
 ------------
@@ -216,7 +219,7 @@ do {
     ...
 }
 
-// Or this automatic validation can be disabled for a given request:
+// Or it can be disabled for a specific request:
 do {
     // The server will return status code 404
     let config = RequestConfig(autoValidation: false)
