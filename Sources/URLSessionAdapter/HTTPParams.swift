@@ -14,6 +14,13 @@ public struct HTTPParams {
     public var cachePolicy: URLRequest.CachePolicy?
     public var timeoutInterval: TimeInterval?
     public var headerValues: [(value: String, forHTTPHeaderField: String)]?
+    
+    public init(httpBody: Data? = nil, cachePolicy: URLRequest.CachePolicy? = nil, timeoutInterval: TimeInterval? = nil, headerValues: [(value: String, forHTTPHeaderField: String)]? = nil) {
+        self.httpBody = httpBody
+        self.cachePolicy = cachePolicy
+        self.timeoutInterval = timeoutInterval
+        self.headerValues = headerValues
+    }
 }
 
 public enum HTTPHeader: String {
