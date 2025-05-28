@@ -27,7 +27,7 @@ Enter Package URL: https://github.com/denissimon/URLSessionAdapter
 To install URLSessionAdapter using [CocoaPods](https://cocoapods.org), add this line to your `Podfile`:
 
 ```ruby
-pod 'URLSessionAdapter', '~> 1.6'
+pod 'URLSessionAdapter', '~> 1.7'
 ```
 
 #### Carthage
