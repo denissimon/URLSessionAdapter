@@ -96,7 +96,7 @@ final class NetworkServiceTests: XCTestCase {
     // JSONPlaceholderAPI.getPost:
     
     func testRequestGet_asyncAwaitAPI() async throws {
-        let promise = expectation(description: "testRequestGet")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         do {
@@ -118,7 +118,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testRequestGet_withDecodedResult_asyncAwaitAPI() async throws {
-        let promise = expectation(description: "testRequestGet_withDecodedResult")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         do {
@@ -150,7 +150,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testRequestGet_withDecodedResult_andErrorReturned_asyncAwaitAPI() async throws {
-        let promise = expectation(description: "testRequestGet_withDecodedResult_andErrorReturned")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         do {
@@ -182,7 +182,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testRequestWithStatusCodeGet_asyncAwaitAPI() async throws {
-        let promise = expectation(description: "testRequestWithStatusCodeGet")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         do {
@@ -205,7 +205,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testRequestWithStatusCodeGet_withErrorReturned_asyncAwaitAPI() async throws {
-        let promise = expectation(description: "testRequestWithStatusCodeGet_withErrorReturned")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         do {
@@ -237,7 +237,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testRequestWithStatusCodeGet_withErrorReturned_andDisabledRequestAutoValidation_asyncAwaitAPI() async throws {
-        let promise = expectation(description: "testRequestWithStatusCodeGet_withErrorReturned_andDisabledRequestAutoValidation")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         XCTAssertEqual(networkService.autoValidation, true)
@@ -261,7 +261,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testRequestWithStatusCodeGet_withErrorReturned_andDisabledGlobalAutoValidation_asyncAwaitAPI() async throws {
-        let promise = expectation(description: "testRequestWithStatusCodeGet_withErrorReturned_andDisabledGlobalAutoValidation")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkService(autoValidation: false)
         do {
@@ -284,7 +284,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testRequestWithStatusCodeGet_withErrorReturned_andChangingGlobalAutoValidation_asyncAwaitAPI() async throws {
-        let promise = expectation(description: "testRequestWithStatusCodeGet_withErrorReturned_andChangingGlobalAutoValidation")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkService(urlSession: URLSession(configuration: .default))
         XCTAssertEqual(networkService.autoValidation, true)
@@ -313,7 +313,7 @@ final class NetworkServiceTests: XCTestCase {
     // JSONPlaceholderAPI.createPost:
     
     func testRequestPost_withDecodedResult_asyncAwaitAPI() async throws {
-        let promise = expectation(description: "testRequestPost_withDecodedResult")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         do {
@@ -346,7 +346,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testRequestPost_withDecodedResult_andUploadTask_asyncAwaitAPI() async throws {
-        let promise = expectation(description: "testRequestPost_withDecodedResult_andUploadTask")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         do {
@@ -373,7 +373,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testRequestWithStatusCodePost_asyncAwaitAPI() async throws {
-        let promise = expectation(description: "testRequestWithStatusCodePost")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         
@@ -397,7 +397,7 @@ final class NetworkServiceTests: XCTestCase {
     // JSONPlaceholderAPI.updatePost:
     
     func testRequestPut_withDecodedResult_asyncAwaitAPI() async throws {
-        let promise = expectation(description: "testRequestPut_withDecodedResult")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         do {
@@ -424,7 +424,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testRequestPut_withDecodedResult_andUploadTask_asyncAwaitAPI() async throws {
-        let promise = expectation(description: "testRequestPut_withDecodedResult_andUploadTask")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         do {
@@ -453,7 +453,7 @@ final class NetworkServiceTests: XCTestCase {
     // JSONPlaceholderAPI.patchPost:
     
     func testRequestPatch_withDecodedResult_asyncAwaitAPI() async throws {
-        let promise = expectation(description: "testRequestPatch_withDecodedResult")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         do {
@@ -481,7 +481,7 @@ final class NetworkServiceTests: XCTestCase {
     // Fetch or download the file from the provided URL:
     
     func testFetchFile_asyncAwaitAPI() async throws {
-        let promise = expectation(description: "testFetchFile")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         let data = try? await networkService.fetchFile(url: URL(string: "https://farm66.staticflickr.com/65535/53629782624_8da817eff2_b.jpg")!)
@@ -492,7 +492,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testFetchFileWithStatusCode_asyncAwaitAPI() async throws {
-        let promise = expectation(description: "testFetchFileWithStatusCode")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         if let data = try? await networkService.fetchFileWithStatusCode(url: URL(string: "https://farm66.staticflickr.com/65535/53629782624_8da817eff2_b.jpg")!) {
@@ -505,7 +505,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testFetchFileWithStatusCode_whenInvalidURL_asyncAwaitAPI() async throws {
-        let promise = expectation(description: "testFetchFileWithStatusCode_whenInvalidURL")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         do {
@@ -521,7 +521,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testFetchFileWithStatusCode_whenInvalidURL_andDisabledRequestAutoValidation_asyncAwaitAPI() async throws {
-        let promise = expectation(description: "testFetchFileWithStatusCode_whenInvalidURL_andDisabledRequestAutoValidation")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         XCTAssertEqual(networkService.autoValidation, true)
@@ -538,7 +538,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testFetchFileWithStatusCode_whenInvalidURL_andDisabledGlobalAutoValidation_asyncAwaitAPI() async throws {
-        let promise = expectation(description: "testFetchFileWithStatusCode_whenInvalidURL_andDisabledGlobalAutoValidation")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkService(autoValidation: false)
         do {
@@ -554,7 +554,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testDownloadFile_asyncAwaitAPI() async throws {
-        let promise = expectation(description: "testDownloadFile")
+        let promise = expectation(description: #function)
         
         let url = URL(string: "https://farm66.staticflickr.com/65535/53629782624_8da817eff2_b.jpg")!
         let documentsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -584,7 +584,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testDownloadFileWithStatusCode_asyncAwaitAPI() async throws {
-        let promise = expectation(description: "testDownloadFileWithStatusCode")
+        let promise = expectation(description: #function)
         
         let url = URL(string: "https://farm66.staticflickr.com/65535/53629782624_8da817eff2_b.jpg")!
         let documentsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -619,7 +619,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testDownloadFileWithStatusCode_whenInvalidURL_asyncAwaitAPI() async throws {
-        let promise = expectation(description: "testDownloadFileWithStatusCode_whenInvalidURL")
+        let promise = expectation(description: #function)
         
         let url = URL(string: "https://jsonplaceholder.typicode.com/some_image.jpg")!
         let documentsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -645,7 +645,7 @@ final class NetworkServiceTests: XCTestCase {
     // JSONPlaceholderAPI.getPost:
     
     func testRequestGet_callbacksAPI() {
-        let promise = expectation(description: "testRequestGet")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         
@@ -667,7 +667,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testRequestGet_withDecodedResult_callbacksAPI() {
-        let promise = expectation(description: "testRequestGet_withDecodedResult")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         
@@ -699,7 +699,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testRequestGet_withDecodedResult_andErrorReturned_callbacksAPI() {
-        let promise = expectation(description: "testRequestGet_withDecodedResult_andErrorReturned")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         
@@ -731,7 +731,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testRequestWithStatusCodeGet_callbacksAPI() {
-        let promise = expectation(description: "testRequestWithStatusCodeGet")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         
@@ -754,7 +754,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testRequestWithStatusCodeGet_withErrorReturned_callbacksAPI() {
-        let promise = expectation(description: "testRequestWithStatusCodeGet_withErrorReturned")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         
@@ -786,7 +786,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testRequestWithStatusCodeGet_withErrorReturned_andDisabledRequestAutoValidation_callbacksAPI() {
-        let promise = expectation(description: "testRequestWithStatusCodeGet_withErrorReturned_andDisabledRequestAutoValidation")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         
@@ -813,7 +813,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testRequestWithStatusCodeGet_withErrorReturned_andDisabledGlobalAutoValidation_callbacksAPI() {
-        let promise = expectation(description: "testRequestWithStatusCodeGet_withErrorReturned_andDisabledGlobalAutoValidation")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkService(autoValidation: false)
         
@@ -839,7 +839,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testRequestWithStatusCodeGet_withErrorReturned_andChangingGlobalAutoValidation_callbacksAPI() {
-        let promise = expectation(description: "testRequestWithStatusCodeGet_withErrorReturned_andChangingGlobalAutoValidation")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkService(urlSession: URLSession(configuration: .default))
         XCTAssertEqual(networkService.autoValidation, true)
@@ -870,7 +870,7 @@ final class NetworkServiceTests: XCTestCase {
     // JSONPlaceholderAPI.createPost:
     
     func testRequestPost_withDecodedResult_callbacksAPI() {
-        let promise = expectation(description: "testRequestPost_withDecodedResult")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         
@@ -903,7 +903,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testRequestPost_withDecodedResult_andUploadTask_callbacksAPI() {
-        let promise = expectation(description: "testRequestPost_withDecodedResult_andUploadTask")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         
@@ -933,7 +933,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testRequestWithStatusCodePost_callbacksAPI() {
-        let promise = expectation(description: "testRequestWithStatusCodePost")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         
@@ -959,7 +959,7 @@ final class NetworkServiceTests: XCTestCase {
     // JSONPlaceholderAPI.updatePost:
     
     func testRequestPut_withDecodedResult_callbacksAPI() {
-        let promise = expectation(description: "testRequestPut_withDecodedResult")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         
@@ -989,7 +989,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testRequestPut_withDecodedResult_andUploadTask_callbacksAPI() {
-        let promise = expectation(description: "testRequestPut_withDecodedResult_andUploadTask")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         
@@ -1021,7 +1021,7 @@ final class NetworkServiceTests: XCTestCase {
     // JSONPlaceholderAPI.patchPost:
     
     func testRequestPatch_withDecodedResult_callbacksAPI() {
-        let promise = expectation(description: "testRequestPatch_withDecodedResult")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         
@@ -1052,7 +1052,7 @@ final class NetworkServiceTests: XCTestCase {
     // Fetch or download the file from the provided URL:
     
     func testFetchFile_callbacksAPI() {
-        let promise = expectation(description: "testFetchFile")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         let _ = networkService.fetchFile(url: URL(string: "https://farm66.staticflickr.com/65535/53629782624_8da817eff2_b.jpg")!) { response in
@@ -1069,7 +1069,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testFetchFileWithStatusCode_callbacksAPI() {
-        let promise = expectation(description: "testFetchFileWithStatusCode")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         let _ = networkService.fetchFileWithStatusCode(url: URL(string: "https://farm66.staticflickr.com/65535/53629782624_8da817eff2_b.jpg")!) { response in
@@ -1087,7 +1087,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testFetchFileWithStatusCode_whenInvalidURL_callbacksAPI() {
-        let promise = expectation(description: "testFetchFileWithStatusCode_whenInvalidURL")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         let _ = networkService.fetchFileWithStatusCode(url: URL(string: "https://jsonplaceholder.typicode.com/some_image.jpg")!) { response in
@@ -1111,7 +1111,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testFetchFileWithStatusCode_whenInvalidURL_andDisabledRequestAutoValidation_callbacksAPI() {
-        let promise = expectation(description: "testFetchFileWithStatusCode_whenInvalidURL_andDisabledRequestAutoValidation")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkServiceTests.networkService
         XCTAssertEqual(networkService.autoValidation, true)
@@ -1130,7 +1130,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testFetchFileWithStatusCode_whenInvalidURL_andDisabledGlobalAutoValidation_callbacksAPI() {
-        let promise = expectation(description: "testFetchFileWithStatusCode_whenInvalidURL_andDisabledGlobalAutoValidation")
+        let promise = expectation(description: #function)
         
         let networkService = NetworkService(autoValidation: false)
         let _ = networkService.fetchFileWithStatusCode(url: URL(string: "https://jsonplaceholder.typicode.com/some_image.jpg")!) { response in
@@ -1148,7 +1148,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testDownloadFile_callbacksAPI() {
-        let promise = expectation(description: "testDownloadFile")
+        let promise = expectation(description: #function)
         
         let url = URL(string: "https://farm66.staticflickr.com/65535/53629782624_8da817eff2_b.jpg")!
         let documentsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -1178,7 +1178,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testDownloadFileWithStatusCode_callbacksAPI() {
-        let promise = expectation(description: "testDownloadFileWithStatusCode")
+        let promise = expectation(description: #function)
         
         let url = URL(string: "https://farm66.staticflickr.com/65535/53629782624_8da817eff2_b.jpg")!
         let documentsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -1209,7 +1209,7 @@ final class NetworkServiceTests: XCTestCase {
     }
     
     func testDownloadFileWithStatusCode_whenInvalidURL_callbacksAPI() {
-        let promise = expectation(description: "testDownloadFileWithStatusCode_whenInvalidURL")
+        let promise = expectation(description: #function)
         
         let url = URL(string: "https://jsonplaceholder.typicode.com/some_image.jpg")!
         let documentsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
