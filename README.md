@@ -27,7 +27,7 @@ Enter Package URL: https://github.com/denissimon/URLSessionAdapter
 To install URLSessionAdapter using [CocoaPods](https://cocoapods.org), add this line to your `Podfile`:
 
 ```ruby
-pod 'URLSessionAdapter', '~> 1.8'
+pod 'URLSessionAdapter', '~> 1.9'
 ```
 
 #### Carthage
@@ -103,7 +103,7 @@ class ActivityRepository {
         self.networkService = networkService
     }
     
-    func getActivity(id: Int) async -> Result<Activity, CustomError>
+    func getActivity(id: Int) async -> Result<Activity, CustomError> {
         let endpoint = APIEndpoints.getActivity(id: id)
         guard let request = RequestFactory.request(endpoint) else { return .failure(customError()) }
         do {
@@ -161,13 +161,13 @@ Task {
 
 ```swift
 // To fetch a file:
-let data = try await networkService.fetchFile(url: url).value
+let data = try await networkService.fetchFile(url: url).data
 guard let image = UIImage(data: data) else {
     ...
 }
 
 // To download a file:
-guard try await networkService.downloadFile(url: url, to: localUrl).value else {
+guard try await networkService.downloadFile(url: url, to: localUrl).result else {
     ...
 }
 
@@ -175,7 +175,11 @@ guard try await networkService.downloadFile(url: url, to: localUrl).value else {
 let endpoint = JSONPlaceholderAPI.uploadFile(file)
 guard let request = RequestFactory.request(endpoint) else { return }
 let config = RequestConfiguration(uploadTask: true)
-let (data, statusCode) = try await networkService.request(request, configuration: config)
+let (data, response) = try await networkService.request(request, configuration: config)
+
+// Check the returned status code
+guard let httpResponse = response as? HTTPURLResponse else { return }
+assert(httpResponse?.statusCode == 200)
 ```
 
 **Validation:**
@@ -229,17 +233,17 @@ More usage examples can be found in [tests](https://github.com/denissimon/URLSes
 ```swift
 // async/await API
 
-func request(_ request: URLRequest, configuration: RequestConfiguration?) async throws -> (value: Data, statusCode: Int?)
-func request<T: Decodable>(_ request: URLRequest, type: T.Type, configuration: RequestConfiguration?) async throws -> (value: T, statusCode: Int?)
-func fetchFile(url: URL, configuration: RequestConfiguration?) async throws -> (value: Data?, statusCode: Int?)
-func downloadFile(url: URL, to localUrl: URL, configuration: RequestConfiguration?) async throws -> (value: Bool, statusCode: Int?)
+func request(_ request: URLRequest, configuration: RequestConfiguration?) async throws -> (data: Data, response: URLResponse)
+func request<T: Decodable>(_ request: URLRequest, type: T.Type, configuration: RequestConfiguration?) async throws -> (decoded: T, response:URLResponse)
+func fetchFile(url: URL, configuration: RequestConfiguration?) async throws -> (data: Data?, response: URLResponse)
+func downloadFile(url: URL, to localUrl: URL, configuration: RequestConfiguration?) async throws -> (result: Bool, response: URLResponse)
 
 // callbacks API
 
-func request(_ request: URLRequest, configuration: RequestConfiguration?, completion: @escaping (Result<(value: Data?, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
-func request<T: Decodable>(_ request: URLRequest, type: T.Type, configuration: RequestConfiguration?, completion: @escaping (Result<(value: T, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
-func fetchFile(url: URL, configuration: RequestConfiguration?, completion: @escaping (Result<(value: Data?, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
-func downloadFile(url: URL, to localUrl: URL, configuration: RequestConfiguration?, completion: @escaping (Result<(value: Bool, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
+func request(_ request: URLRequest, configuration: RequestConfiguration?, completion: @escaping (Result<(data: Data?, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
+func request<T: Decodable>(_ request: URLRequest, type: T.Type, configuration: RequestConfiguration?, completion: @escaping (Result<(decoded: T, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
+func fetchFile(url: URL, configuration: RequestConfiguration?, completion: @escaping (Result<(data: Data?, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
+func downloadFile(url: URL, to localUrl: URL, configuration: RequestConfiguration?, completion: @escaping (Result<(result: Bool, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
 ```
 
 Requirements
