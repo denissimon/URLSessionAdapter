@@ -73,7 +73,7 @@ final class NetworkService: NetworkServiceType {
     public let urlSession: URLSession
     
     private let lock = NSLock()
-    nonisolated(unsafe) public var autoValidation: Bool {
+    public var autoValidation: Bool {
         get { lock.withLock { _autoValidation } }
         set { lock.withLock { _autoValidation = newValue } }
     }
