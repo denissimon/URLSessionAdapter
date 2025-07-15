@@ -1,6 +1,6 @@
 # URLSessionAdapter
 
-[![Swift](https://img.shields.io/badge/Swift-5-orange.svg?style=flat)](https://swift.org)
+[![Swift](https://img.shields.io/badge/Swift-6-orange.svg?style=flat)](https://swift.org)
 [![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20macOS%20%7C%20watchOS%20%7C%20tvOS-lightgrey.svg)](https://developer.apple.com/swift/)
 
 A Codable wrapper around URLSession for networking. Includes both APIs: async/await and callbacks. 
