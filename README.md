@@ -6,9 +6,10 @@
 A Codable wrapper around URLSession for networking. Includes both APIs: async/await and callbacks. 
 
 Supports:
-* _data_, _upload_, and _download_ URL session tasks
+* _Data_, _Upload_, and _Download_ URL session tasks
 * HTTP methods: GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS, CONNECT, TRACE, QUERY
 * Automatic validation: global or per request based on the received status code
+* Delegates to receive progress updates
 
 Installation
 ------------
@@ -27,7 +28,7 @@ Enter Package URL: https://github.com/denissimon/URLSessionAdapter
 To install URLSessionAdapter using [CocoaPods](https://cocoapods.org), add this line to your `Podfile`:
 
 ```ruby
-pod 'URLSessionAdapter', '~> 1.7'
+pod 'URLSessionAdapter', '~> 2.2'
 ```
 
 #### Carthage
@@ -45,17 +46,17 @@ Copy folder `URLSessionAdapter` into your project.
 Usage
 -----
 
-**Defining a Codable instance:**
+**Defining a Decodable/Codable instance**
 
 ```swift
-struct Activity: Codable {
+struct Activity: Decodable {
     let id: Int?
     let name: String
     let description: String
 }
 ```
 
-**Defining API endpoints:**
+**Defining API endpoints**
 
 ```swift
 import URLSessionAdapter
@@ -90,7 +91,7 @@ struct APIEndpoints {
 }
 ```
 
-**Defining API methods:**
+**Defining API methods**
 
 ```swift
 import URLSessionAdapter
@@ -103,22 +104,22 @@ class ActivityRepository {
         self.networkService = networkService
     }
     
-    func getActivity(id: Int) async -> Result<Activity, CustomError>
+    func getActivity(id: Int) async -> Result<Activity, CustomError> {
         let endpoint = APIEndpoints.getActivity(id: id)
         guard let request = RequestFactory.request(endpoint) else { return .failure(customError()) }
         do {
-            let activity = try await networkService.request(request, type: Activity.self)
+            let (activity, _) = try await networkService.request(request, type: Activity.self)
             return .success(activity)
         } catch {
             return .failure(error as! CustomError)
         }
     }
     
-    func createActivity(_ activity: Activity) async -> Result<Data?, CustomError> {
+    func createActivity(_ activity: Activity) async -> Result<Data, CustomError> {
         let endpoint = APIEndpoints.createActivity(activity)
         guard let request = RequestFactory.request(endpoint) else { return .failure(customError()) }
         do {
-            let data = try await networkService.request(request)
+            let (data, _) = try await networkService.request(request)
             return .success(data)
         } catch {
             return .failure(error as! CustomError)
@@ -127,7 +128,7 @@ class ActivityRepository {
 }
 ```
 
-**API calls:**
+**API calls**
 
 ```swift
 let networkService = NetworkService(urlSession: URLSession.shared)
@@ -161,39 +162,34 @@ Task {
 
 ```swift
 // To fetch a file:
-let data = try await networkService.fetchFile(url: url)
+let data = try await networkService.fetchFile(url).data
 guard let image = UIImage(data: data) else {
     ...
 }
 
 // To download a file:
-guard try await networkService.downloadFile(url: url, to: localUrl) else {
+guard try await networkService.downloadFile(url, to: localUrl).result else {
     ...
 }
 
 // To upload a file:
 let endpoint = JSONPlaceholderAPI.uploadFile(file)
 guard let request = RequestFactory.request(endpoint) else { return }
-let config = RequestConfig(uploadTask: true)
-let response = try await networkService.request(request, config: config)
+let config = RequestConfiguration(uploadTask: true)
+let (data, response) = try await networkService.request(request, configuration: config)
+
+// Check the returned status code:
+guard let httpResponse = response as? HTTPURLResponse else { return }
+assert(httpResponse.statusCode == 200)
 ```
 
-```swift
-// To get a result with status code:
-let endpoint = JSONPlaceholderAPI.createPost(post)
-guard let request = RequestFactory.request(endpoint) else { return }
-let response = try await networkService.requestWithStatusCode(request, type: Post.self)
-let post = response.result // Returned created Post
-let statusCode = response.statusCode // Returned 201 status code
-```
-
-**Validation:**
+**Validation**
 
 ```swift
-// By default, any 400-599 status code returned by the server throws a NetworkError:
+// By default, any 300-599 status code returned by the server throws a NetworkError:
 do {
     // The server will return status code 404
-    let response = try await networkService.requestWithStatusCode(request)
+    let response = try await networkService.request(request)
     ...
 } catch {
     if error is NetworkError {
@@ -209,12 +205,14 @@ do {
 }
 
 // Optionally, this automatic validation can be disabled globally:
+
 networkService.autoValidation = false
+
 do {
     // The server will return status code 404
-    let response = try await networkService.requestWithStatusCode(request)
-    let statusCode = response.statusCode // 404
-    let resultStr = String(data: response.result ?? Data(), encoding: .utf8)!
+    let response = try await networkService.request(request)
+    let statusCode = (response as? HTTPURLResponse)?.statusCode // 404
+    let resultStr = String(data: response.value ?? Data(), encoding: .utf8)!
 } catch {
     ...
 }
@@ -222,15 +220,30 @@ do {
 // Or it can be disabled for a specific request:
 do {
     // The server will return status code 404
-    let config = RequestConfig(autoValidation: false)
-    let response = try await networkService.requestWithStatusCode(request, config: config)
-    let statusCode = response.statusCode // 404
-    let resultStr = String(data: response.result ?? Data(), encoding: .utf8)!
+    let config = RequestConfiguration(validation: false)
+    let response = try await networkService.request(request, configuration: config)
+    let statusCode = (response as? HTTPURLResponse)?.statusCode // 404
+    let resultStr = String(data: response.value ?? Data(), encoding: .utf8)!
 } catch {
     ...
 }
 ```
-        
+
+**Receive progress updates**
+
+```swift
+let progressObserver = ProgressObserver {
+    print($0.fractionCompleted) // Outputs: 0.05 0.0595 1.0
+}
+    
+do {
+    let (result, response) = try await networkService.downloadFile(url, to: destinationUrl, delegate: progressObserver)
+    ...
+} catch {
+    ...
+}
+```
+
 More usage examples can be found in [tests](https://github.com/denissimon/URLSessionAdapter/tree/main/Tests/URLSessionAdapterTests) and [iOS-MVVM-Clean-Architecture](https://github.com/denissimon/iOS-MVVM-Clean-Architecture) where this adapter was used.
 
 ### Public methods
@@ -238,27 +251,17 @@ More usage examples can be found in [tests](https://github.com/denissimon/URLSes
 ```swift
 // async/await API
 
-func request(_ request: URLRequest, config: RequestConfig?) async throws -> Data
-func request<T: Decodable>(_ request: URLRequest, type: T.Type, config: RequestConfig?) async throws -> T
-func fetchFile(url: URL, config: RequestConfig?) async throws -> Data?
-func downloadFile(url: URL, to localUrl: URL, config: RequestConfig?) async throws -> Bool
-
-func requestWithStatusCode(_ request: URLRequest, config: RequestConfig?) async throws -> (result: Data, statusCode: Int?)
-func requestWithStatusCode<T: Decodable>(_ request: URLRequest, type: T.Type, config: RequestConfig?) async throws -> (result: T, statusCode: Int?)
-func fetchFileWithStatusCode(url: URL, config: RequestConfig?) async throws -> (result: Data?, statusCode: Int?)
-func downloadFileWithStatusCode(url: URL, to localUrl: URL, config: RequestConfig?) async throws -> (result: Bool, statusCode: Int?)
+func request(_ request: URLRequest, configuration: RequestConfiguration?, delegate: URLSessionDataDelegate?) async throws -> (data: Data, response: URLResponse)
+func request<T: Decodable>(_ request: URLRequest, type: T.Type, configuration: RequestConfiguration?, delegate: URLSessionDataDelegate?) async throws -> (decoded: T, response: URLResponse)
+func fetchFile(_ url: URL, configuration: RequestConfiguration?, delegate: URLSessionDataDelegate?) async throws -> (data: Data?, response: URLResponse)
+func downloadFile(_ url: URL, to localUrl: URL, configuration: RequestConfiguration?, delegate: URLSessionDataDelegate?) async throws -> (result: Bool, response: URLResponse)
 
 // callbacks API
 
-func request(_ request: URLRequest, config: RequestConfig?, completion: @escaping (Result<Data?, NetworkError>) -> Void) -> NetworkCancellable?
-func request<T: Decodable>(_ request: URLRequest, type: T.Type, config: RequestConfig?, completion: @escaping (Result<T, NetworkError>) -> Void) -> NetworkCancellable?
-func fetchFile(url: URL, config: RequestConfig?, completion: @escaping (Result<Data?, NetworkError>) -> Void) -> NetworkCancellable?
-func downloadFile(url: URL, to localUrl: URL, config: RequestConfig?, completion: @escaping (Result<Bool, NetworkError>) -> Void) -> NetworkCancellable?
-
-func requestWithStatusCode(_ request: URLRequest, config: RequestConfig?, completion: @escaping (Result<(result: Data?, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
-func requestWithStatusCode<T: Decodable>(_ request: URLRequest, type: T.Type, config: RequestConfig?, completion: @escaping (Result<(result: T, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
-func fetchFileWithStatusCode(url: URL, config: RequestConfig?, completion: @escaping (Result<(result: Data?, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
-func downloadFileWithStatusCode(url: URL, to localUrl: URL, config: RequestConfig?, completion: @escaping (Result<(result: Bool, statusCode: Int?), NetworkError>) -> Void) -> NetworkCancellable?
+func request(_ request: URLRequest, configuration: RequestConfiguration?, completion: @escaping (Result<(data: Data?, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
+func request<T: Decodable>(_ request: URLRequest, type: T.Type, configuration: RequestConfiguration?, completion: @escaping (Result<(decoded: T, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
+func fetchFile(_ url: URL, configuration: RequestConfiguration?, completion: @escaping (Result<(data: Data?, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
+func downloadFile(_ url: URL, to localUrl: URL, configuration: RequestConfiguration?, completion: @escaping (Result<(result: Bool, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
 ```
 
 Requirements
