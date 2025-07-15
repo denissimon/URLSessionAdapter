@@ -258,10 +258,10 @@ func downloadFile(_ url: URL, to localUrl: URL, configuration: RequestConfigurat
 
 // callbacks API
 
-func request(_ request: URLRequest, configuration: RequestConfiguration?, completion: @escaping (Result<(data: Data?, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
-func request<T: Decodable>(_ request: URLRequest, type: T.Type, configuration: RequestConfiguration?, completion: @escaping (Result<(decoded: T, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
-func fetchFile(_ url: URL, configuration: RequestConfiguration?, completion: @escaping (Result<(data: Data?, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
-func downloadFile(_ url: URL, to localUrl: URL, configuration: RequestConfiguration?, completion: @escaping (Result<(result: Bool, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
+func request(_ request: URLRequest, configuration: RequestConfiguration?, completion: @escaping @Sendable (Result<(data: Data?, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
+func request<T: Decodable>(_ request: URLRequest, type: T.Type, configuration: RequestConfiguration?, completion: @escaping @Sendable (Result<(decoded: T, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
+func fetchFile(_ url: URL, configuration: RequestConfiguration?, completion: @escaping @Sendable (Result<(data: Data?, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
+func downloadFile(_ url: URL, to localUrl: URL, configuration: RequestConfiguration?, completion: @escaping @Sendable (Result<(result: Bool, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
 ```
 
 Requirements
