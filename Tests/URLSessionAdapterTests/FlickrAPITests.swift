@@ -12,10 +12,6 @@ import XCTest
 
 // From https://github.com/denissimon/iOS-MVVM-Clean-Architecture
 
-@available(iOS 15.0, *)
-@available(macOS 12.0, *)
-@available(tvOS 15.0, *)
-@available(watchOS 8.0, *)
 final class FlickrAPITests: XCTestCase {
     
     // https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=8ca55bca1384f45ab957b7618afc6ecc&text=%22nice%22&per_page=5&format=json&nojsoncallback=1

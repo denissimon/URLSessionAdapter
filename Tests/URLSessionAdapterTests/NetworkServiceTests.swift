@@ -10,10 +10,6 @@
 import XCTest
 @testable import URLSessionAdapter
 
-@available(iOS 15.0, *)
-@available(macOS 12.0, *)
-@available(tvOS 15.0, *)
-@available(watchOS 8.0, *)
 final class NetworkServiceTests: XCTestCase {
 
     static let networkService = NetworkService(urlSession: URLSession(configuration: .default))
