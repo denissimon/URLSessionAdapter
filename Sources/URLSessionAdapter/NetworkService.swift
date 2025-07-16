@@ -36,10 +36,6 @@ public struct RequestConfiguration: Sendable {
     }
 }
 
-@available(iOS 15.0, *)
-@available(macOS 12.0, *)
-@available(tvOS 15.0, *)
-@available(watchOS 8.0, *)
 public protocol NetworkServiceAsyncAwaitType: Sendable {
     var urlSession: URLSession { get }
     
@@ -58,17 +54,9 @@ public protocol NetworkServiceCallbacksType: Sendable {
     func downloadFile(_ url: URL, to localUrl: URL, configuration: RequestConfiguration?, completion: @escaping @Sendable (Result<(result: Bool, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
 }
 
-@available(iOS 15.0, *)
-@available(macOS 12.0, *)
-@available(tvOS 15.0, *)
-@available(watchOS 8.0, *)
 public typealias NetworkServiceType = NetworkServiceAsyncAwaitType & NetworkServiceCallbacksType
 
-@available(iOS 15.0, *)
-@available(macOS 12.0, *)
-@available(tvOS 15.0, *)
-@available(watchOS 8.0, *)
-final class NetworkService: NetworkServiceType {
+final public class NetworkService: NetworkServiceType {
        
     public let urlSession: URLSession
     
