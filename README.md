@@ -252,7 +252,11 @@ let progressObserver = ProgressObserver {
 }
     
 do {
-    let (result, response) = try await networkService.downloadFile(url, to: destinationUrl, delegate: progressObserver)
+    let (result, response) = try await networkService.downloadFile(
+        url,
+        to: destinationUrl,
+        delegate: progressObserver
+    )
     ...
 } catch {
     ...
