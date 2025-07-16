@@ -1,20 +1,22 @@
 # URLSessionAdapter
 
 [![Swift](https://img.shields.io/badge/Swift-6-orange.svg?style=flat)](https://swift.org)
-[![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20macOS%20%7C%20watchOS%20%7C%20tvOS-lightgrey.svg)](https://developer.apple.com/swift/)
+[![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20macOS%20%7C%20watchOS%20%7C%20tvOS%20%7C%20Linux-lightgrey.svg)](https://developer.apple.com/swift/)
 
-A Codable wrapper around URLSession for networking. Includes both APIs: async/await and callbacks. 
+A Codable wrapper around URLSession for networking. Includes both APIs: **async/await** and **callbacks**. 
 
-Supports:
-* _Data_, _Upload_, and _Download_ URL session tasks
+Supports
+--------
+* `Data`, `Upload`, and `Download` URL session tasks
 * HTTP methods: GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS, CONNECT, TRACE, QUERY
 * Automatic validation: global or per request based on the received status code
 * Delegates to receive progress updates
+* Swift 6 with Strict Concurrency Checking
 
 Installation
 ------------
 
-#### Swift Package Manager
+### Swift Package Manager
 
 To install URLSessionAdapter using [Swift Package Manager](https://swift.org/package-manager):
 
@@ -23,7 +25,15 @@ Xcode: File -> Add Packages
 Enter Package URL: https://github.com/denissimon/URLSessionAdapter
 ```
 
-#### CocoaPods
+If you're using URLSessionAdapter as part of a Swift package:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/denissimon/URLSessionAdapter.git", from: "2.2.4")
+]
+```
+
+### CocoaPods
 
 To install URLSessionAdapter using [CocoaPods](https://cocoapods.org), add this line to your `Podfile`:
 
@@ -31,7 +41,7 @@ To install URLSessionAdapter using [CocoaPods](https://cocoapods.org), add this 
 pod 'URLSessionAdapter', '~> 2.2'
 ```
 
-#### Carthage
+### Carthage
 
 To install URLSessionAdapter using [Carthage](https://github.com/Carthage/Carthage), add this line to your `Cartfile`:
 
@@ -39,14 +49,14 @@ To install URLSessionAdapter using [Carthage](https://github.com/Carthage/Cartha
 github "denissimon/URLSessionAdapter"
 ```
 
-#### Manually
+### Manually
 
 Copy folder `URLSessionAdapter` into your project.
 
 Usage
 -----
 
-**Defining a Decodable/Codable instance**
+### Defining a Decodable/Codable instance
 
 ```swift
 struct Activity: Decodable {
@@ -56,7 +66,7 @@ struct Activity: Decodable {
 }
 ```
 
-**Defining API endpoints**
+### Defining API endpoints
 
 ```swift
 import URLSessionAdapter
@@ -64,10 +74,9 @@ import URLSessionAdapter
 struct APIEndpoints {
     
     static let baseURL = "https://api.example.com/rest"
-    static let apiKey = "api_key"
     
     static func getActivity(id: Int) -> EndpointType {
-        let path = "/activities/\(id)/?api_key=\(APIEndpoints.apiKey)"        
+        let path = "/activities/\(id)/?key=\(Secrets.apiKey)"        
         return Endpoint(
             method: .GET,
             baseURL: APIEndpoints.baseURL,
@@ -76,11 +85,12 @@ struct APIEndpoints {
     }
     
     static func createActivity(_ activity: Activity) -> EndpointType {
-        let path = "/activities/?api_key=\(APIEndpoints.apiKey)"
-        
-        let activityData = activity.encode()
-        let params = HTTPParams(httpBody: activityData, headerValues:[
-        (value: "application/json", forHTTPHeaderField: "Content-Type")])
+        let path = "/activities/?key=\(Secrets.apiKey)"
+
+        let params = HTTPParams(httpBody: activity.encode(), headerValues: [(
+            value: "application/json",
+            forHTTPHeaderField: "Content-Type")
+        ])
         
         return Endpoint(
             method: .POST,
@@ -91,44 +101,44 @@ struct APIEndpoints {
 }
 ```
 
-**Defining API methods**
+### Defining API methods
 
 ```swift
 import URLSessionAdapter
 
 class ActivityRepository {
     
-    let networkService: NetworkServiceType
+    let networkService: NetworkService
     
-    init(networkService: NetworkServiceType) {
+    init(networkService: NetworkService) {
         self.networkService = networkService
     }
     
     func getActivity(id: Int) async -> Result<Activity, CustomError> {
         let endpoint = APIEndpoints.getActivity(id: id)
-        guard let request = RequestFactory.request(endpoint) else { return .failure(customError()) }
+        guard let request = RequestFactory.request(endpoint) else { ... }
         do {
             let (activity, _) = try await networkService.request(request, type: Activity.self)
             return .success(activity)
         } catch {
-            return .failure(error as! CustomError)
+            ...
         }
     }
     
     func createActivity(_ activity: Activity) async -> Result<Data, CustomError> {
         let endpoint = APIEndpoints.createActivity(activity)
-        guard let request = RequestFactory.request(endpoint) else { return .failure(customError()) }
+        guard let request = RequestFactory.request(endpoint) else { ... }
         do {
             let (data, _) = try await networkService.request(request)
             return .success(data)
         } catch {
-            return .failure(error as! CustomError)
+            ...
         }
     }
 }
 ```
 
-**API calls**
+### API calls
 
 ```swift
 let networkService = NetworkService(urlSession: URLSession.shared)
@@ -145,14 +155,11 @@ Task {
 }
 
 Task {
-    // The server returns the id of the created activity
-    let result = await activityRepository.createActivity(activity)
+    let result = await activityRepository.createActivity(activity) // will return the id of the created activity
     switch result {
     case .success(let data):
         guard let data = data, 
-              let createdActivityId = Int(String(data: data, encoding: .utf8) ?? "") else {
-            ...
-        }
+              let activityId = Int(String(data: data, encoding: .utf8) ?? "") else { ... }
         ...
     case .failure(let error):
         ...
@@ -160,76 +167,84 @@ Task {
 }
 ```
 
+Fetch a file:
+
 ```swift
-// To fetch a file:
 let data = try await networkService.fetchFile(url).data
 guard let image = UIImage(data: data) else {
     ...
 }
+```
 
-// To download a file:
+Download a file:
+
+```swift
 guard try await networkService.downloadFile(url, to: localUrl).result else {
     ...
 }
+```
 
-// To upload a file:
-let endpoint = JSONPlaceholderAPI.uploadFile(file)
+Upload a file:
+
+```swift
+let endpoint = SomeAPI.uploadFile(file)
 guard let request = RequestFactory.request(endpoint) else { return }
 let config = RequestConfiguration(uploadTask: true)
 let (data, response) = try await networkService.request(request, configuration: config)
+```
 
-// Check the returned status code:
+Check the returned status code:
+
+```swift
 guard let httpResponse = response as? HTTPURLResponse else { return }
 assert(httpResponse.statusCode == 200)
 ```
 
-**Validation**
+### Validation
+
+By default, any 300-599 status code returned by the server throws a `NetworkError`:
 
 ```swift
-// By default, any 300-599 status code returned by the server throws a NetworkError:
 do {
-    // The server will return status code 404
-    let response = try await networkService.request(request)
+    let response = try await networkService.request(request) // will return status code 404
     ...
+} catch let networkError as NetworkError {
+    let description = networkError.error?.localizedDescription
+    let statusCode = networkError.statusCode // 404
+    let dataStr = String(data: networkError.data ?? Data(), encoding: .utf8)!
 } catch {
-    if error is NetworkError {
-        let networkError = error as! NetworkError
-        let errorDescription = networkError.error?.localizedDescription
-        let errorStatusCode = networkError.statusCode // 404
-        let errorDataStr = String(data: networkError.data ?? Data(), encoding: .utf8)!
-        ...
-    } else {
-        // Handling other errors
-        ...
-    }
+    // Handling other errors
 }
+```
 
-// Optionally, this automatic validation can be disabled globally:
+Optionally, this automatic validation can be disabled globally:
 
+```swift
 networkService.autoValidation = false
 
 do {
-    // The server will return status code 404
-    let response = try await networkService.request(request)
+    let response = try await networkService.request(request) // will return status code 404
     let statusCode = (response as? HTTPURLResponse)?.statusCode // 404
-    let resultStr = String(data: response.value ?? Data(), encoding: .utf8)!
-} catch {
-    ...
-}
-
-// Or it can be disabled for a specific request:
-do {
-    // The server will return status code 404
-    let config = RequestConfiguration(validation: false)
-    let response = try await networkService.request(request, configuration: config)
-    let statusCode = (response as? HTTPURLResponse)?.statusCode // 404
-    let resultStr = String(data: response.value ?? Data(), encoding: .utf8)!
+    let dataStr = String(data: response.data ?? Data(), encoding: .utf8)!
 } catch {
     ...
 }
 ```
 
-**Receive progress updates**
+Or it can be disabled for a specific request:
+
+```swift
+do {
+    let config = RequestConfiguration(validation: false)
+    let response = try await networkService.request(request, configuration: config) // will return status code 404
+    let statusCode = (response as? HTTPURLResponse)?.statusCode // 404
+    let dataStr = String(data: response.data ?? Data(), encoding: .utf8)!
+} catch {
+    ...
+}
+```
+
+### Receive progress updates
 
 ```swift
 let progressObserver = ProgressObserver {
@@ -268,6 +283,8 @@ Requirements
 ------------
 
 iOS 15.0+, macOS 12.0+, tvOS 15.0+, watchOS 8.0+
+
+Xcode 13.0+, Swift 5.5+
 
 License
 -------
