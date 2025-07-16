@@ -21,7 +21,7 @@ public struct RequestEncodable {
 }
 
 extension Encodable {
-    func encode() -> Data? { RequestEncodable.encode(self) }
+    public func encode() -> Data? { RequestEncodable.encode(self) }
 }
 
 public struct ResponseDecodable {
