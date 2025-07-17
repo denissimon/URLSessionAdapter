@@ -9,7 +9,7 @@
 
 import Foundation
 
-public struct HTTPParams {
+public struct HTTPParams: Sendable {
     public var httpBody: Data?
     public var cachePolicy: URLRequest.CachePolicy?
     public var timeoutInterval: TimeInterval?

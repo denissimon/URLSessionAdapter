@@ -9,23 +9,36 @@
 
 import Foundation
 
-public protocol EndpointType {
+public protocol EndpointType: Sendable {
     var method: HTTPMethod { get }
     var baseURL: String { get }
     var path: String { get set }
     var params: HTTPParams? { get set }
 }
 
-public class Endpoint: EndpointType {
+public final class Endpoint: EndpointType {
+    
+    private let lock = NSLock()
+    
     public let method: HTTPMethod
     public let baseURL: String
-    public var path: String
-    public var params: HTTPParams?
+    
+    public var path: String {
+        get { lock.withLock { _path } }
+        set { lock.withLock { _path = newValue } }
+    }
+    nonisolated(unsafe) private var _path: String
+    
+    public var params: HTTPParams? {
+        get { lock.withLock { _params } }
+        set { lock.withLock { _params = newValue } }
+    }
+    nonisolated(unsafe) private var _params: HTTPParams?
     
     public init(method: HTTPMethod, baseURL: String, path: String, params: HTTPParams?) {
         self.method = method
         self.baseURL = baseURL
-        self.path = path
-        self.params = params
+        self._path = path
+        self._params = params
     }
 }
