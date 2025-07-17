@@ -9,10 +9,10 @@
 
 import Foundation
 
-public class ProgressObserver: NSObject, URLSessionDataDelegate, @unchecked Sendable {
+open class ProgressObserver: NSObject, URLSessionDataDelegate, @unchecked Sendable {
     
-    private var observation: NSKeyValueObservation? = nil
-    private let onChangeHandler: (Progress) -> Void
+    var observation: NSKeyValueObservation? = nil
+    let onChangeHandler: (Progress) -> Void
     
     public init(onChangeHandler: @escaping (Progress) -> Void) {
         self.onChangeHandler = onChangeHandler
