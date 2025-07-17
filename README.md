@@ -3,37 +3,36 @@
 [![Swift](https://img.shields.io/badge/Swift-6-orange.svg?style=flat)](https://swift.org)
 [![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20macOS%20%7C%20watchOS%20%7C%20tvOS%20%7C%20Linux-lightgrey.svg)](https://developer.apple.com/swift/)
 
-A Codable wrapper around URLSession for networking. Includes both APIs: **async/await** and **callbacks**. 
+A Codable wrapper around URLSession for networking. Includes both APIs: async/await and callbacks.
 
-Supports
---------
+Supports:
+
 * `Data`, `Upload`, and `Download` URL session tasks
 * HTTP methods: GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS, CONNECT, TRACE, QUERY
 * Automatic validation: global or per request based on the received status code
 * Delegates to receive progress updates
-* Swift 6 with Strict Concurrency Checking
 
 Installation
 ------------
 
-### Swift Package Manager
+#### Swift Package Manager
 
 To install URLSessionAdapter using [Swift Package Manager](https://swift.org/package-manager):
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/denissimon/URLSessionAdapter.git", from: "2.2.5")
+]
+```
+
+Or through Xcode:
 
 ```txt
 Xcode: File -> Add Packages
 Enter Package URL: https://github.com/denissimon/URLSessionAdapter
 ```
 
-If you're using URLSessionAdapter as part of a Swift package:
-
-```swift
-dependencies: [
-    .package(url: "https://github.com/denissimon/URLSessionAdapter.git", from: "2.2.4")
-]
-```
-
-### CocoaPods
+#### CocoaPods
 
 To install URLSessionAdapter using [CocoaPods](https://cocoapods.org), add this line to your `Podfile`:
 
@@ -41,7 +40,7 @@ To install URLSessionAdapter using [CocoaPods](https://cocoapods.org), add this 
 pod 'URLSessionAdapter', '~> 2.2'
 ```
 
-### Carthage
+#### Carthage
 
 To install URLSessionAdapter using [Carthage](https://github.com/Carthage/Carthage), add this line to your `Cartfile`:
 
@@ -49,14 +48,14 @@ To install URLSessionAdapter using [Carthage](https://github.com/Carthage/Cartha
 github "denissimon/URLSessionAdapter"
 ```
 
-### Manually
+#### Manually
 
 Copy folder `URLSessionAdapter` into your project.
 
 Usage
 -----
 
-### Defining a Decodable/Codable instance
+#### Defining a Decodable/Codable instance
 
 ```swift
 struct Activity: Decodable {
@@ -66,7 +65,7 @@ struct Activity: Decodable {
 }
 ```
 
-### Defining API endpoints
+#### Defining API endpoints
 
 ```swift
 import URLSessionAdapter
@@ -101,7 +100,7 @@ struct APIEndpoints {
 }
 ```
 
-### Defining API methods
+#### Defining API methods
 
 ```swift
 import URLSessionAdapter
@@ -138,7 +137,7 @@ class ActivityRepository {
 }
 ```
 
-### API calls
+#### API calls
 
 ```swift
 let networkService = NetworkService(urlSession: URLSession.shared)
@@ -200,7 +199,7 @@ guard let httpResponse = response as? HTTPURLResponse else { return }
 assert(httpResponse.statusCode == 200)
 ```
 
-### Validation
+#### Validation
 
 By default, any 300-599 status code returned by the server throws a `NetworkError`:
 
@@ -244,7 +243,7 @@ do {
 }
 ```
 
-### Receive progress updates
+#### Receive progress updates
 
 ```swift
 let progressObserver = ProgressObserver {
@@ -265,30 +264,26 @@ do {
 
 More usage examples can be found in [tests](https://github.com/denissimon/URLSessionAdapter/tree/main/Tests/URLSessionAdapterTests) and [iOS-MVVM-Clean-Architecture](https://github.com/denissimon/iOS-MVVM-Clean-Architecture) where this adapter was used.
 
-### Public methods
+Public methods
+--------------
+
+**async/await API**
 
 ```swift
-// async/await API
-
 func request(_ request: URLRequest, configuration: RequestConfiguration?, delegate: URLSessionDataDelegate?) async throws -> (data: Data, response: URLResponse)
 func request<T: Decodable>(_ request: URLRequest, type: T.Type, configuration: RequestConfiguration?, delegate: URLSessionDataDelegate?) async throws -> (decoded: T, response: URLResponse)
 func fetchFile(_ url: URL, configuration: RequestConfiguration?, delegate: URLSessionDataDelegate?) async throws -> (data: Data?, response: URLResponse)
 func downloadFile(_ url: URL, to localUrl: URL, configuration: RequestConfiguration?, delegate: URLSessionDataDelegate?) async throws -> (result: Bool, response: URLResponse)
+```
 
-// callbacks API
+**callbacks API**
 
+```swift
 func request(_ request: URLRequest, configuration: RequestConfiguration?, completion: @escaping @Sendable (Result<(data: Data?, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
 func request<T: Decodable>(_ request: URLRequest, type: T.Type, configuration: RequestConfiguration?, completion: @escaping @Sendable (Result<(decoded: T, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
 func fetchFile(_ url: URL, configuration: RequestConfiguration?, completion: @escaping @Sendable (Result<(data: Data?, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
 func downloadFile(_ url: URL, to localUrl: URL, configuration: RequestConfiguration?, completion: @escaping @Sendable (Result<(result: Bool, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
 ```
-
-Requirements
-------------
-
-iOS 15.0+, macOS 12.0+, tvOS 15.0+, watchOS 8.0+
-
-Xcode 13.0+, Swift 5.5+
 
 License
 -------
