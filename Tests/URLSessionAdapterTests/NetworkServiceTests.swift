@@ -10,7 +10,7 @@
 import XCTest
 @testable import URLSessionAdapter
 
-final class NetworkServiceTests: XCTestCase {
+class NetworkServiceTests: XCTestCase {
 
     static let networkService = NetworkService(urlSession: URLSession(configuration: .default))
     
