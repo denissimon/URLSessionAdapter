@@ -10,7 +10,7 @@
 import Foundation
 
 public struct RequestEncodable {
-    public static func encode<T: Encodable>(_ value: T, encoder: JSONEncoder? = nil) -> Data?  {
+    public static func encode<T: Encodable>(_ value: T, encoder: JSONEncoder? = nil) -> Data? {
         let jsonEncoder = encoder ?? JSONEncoder()
         do {
             return try jsonEncoder.encode(value)
