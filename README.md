@@ -17,11 +17,11 @@ Installation
 
 #### Swift Package Manager
 
-To install URLSessionAdapter using [Swift Package Manager](https://swift.org/package-manager):
+To install URLSessionAdapter using [Swift Package Manager](https://swift.org/package-manager), add the following in your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/denissimon/URLSessionAdapter.git", from: "2.2.5")
+    .package(url: "https://github.com/denissimon/URLSessionAdapter.git", from: "2.2.6")
 ]
 ```
 
@@ -55,7 +55,7 @@ Copy folder `URLSessionAdapter` into your project.
 Usage
 -----
 
-#### Defining a Decodable/Codable instance
+### Define a Decodable/Codable instance
 
 ```swift
 struct Activity: Decodable {
@@ -65,7 +65,7 @@ struct Activity: Decodable {
 }
 ```
 
-#### Defining API endpoints
+### Define API endpoints
 
 ```swift
 import URLSessionAdapter
@@ -100,7 +100,7 @@ struct APIEndpoints {
 }
 ```
 
-#### Defining API methods
+### Define API methods
 
 ```swift
 import URLSessionAdapter
@@ -137,7 +137,7 @@ class ActivityRepository {
 }
 ```
 
-#### API calls
+### API calls
 
 ```swift
 let networkService = NetworkService(urlSession: URLSession.shared)
@@ -199,7 +199,7 @@ guard let httpResponse = response as? HTTPURLResponse else { return }
 assert(httpResponse.statusCode == 200)
 ```
 
-#### Validation
+### Validation
 
 By default, any 300-599 status code returned by the server throws a `NetworkError`:
 
@@ -243,7 +243,7 @@ do {
 }
 ```
 
-#### Receive progress updates
+### Progress updates
 
 ```swift
 let progressObserver = ProgressObserver {
@@ -270,10 +270,10 @@ Public methods
 **async/await API**
 
 ```swift
-func request(_ request: URLRequest, configuration: RequestConfiguration?, delegate: URLSessionDataDelegate?) async throws -> (data: Data, response: URLResponse)
-func request<T: Decodable>(_ request: URLRequest, type: T.Type, configuration: RequestConfiguration?, delegate: URLSessionDataDelegate?) async throws -> (decoded: T, response: URLResponse)
-func fetchFile(_ url: URL, configuration: RequestConfiguration?, delegate: URLSessionDataDelegate?) async throws -> (data: Data?, response: URLResponse)
-func downloadFile(_ url: URL, to localUrl: URL, configuration: RequestConfiguration?, delegate: URLSessionDataDelegate?) async throws -> (result: Bool, response: URLResponse)
+func request(_ request: URLRequest, configuration: RequestConfiguration?, delegate: URLSessionTaskDelegate?) async throws -> (data: Data, response: URLResponse)
+func request<T: Decodable>(_ request: URLRequest, type: T.Type, configuration: RequestConfiguration?, delegate: URLSessionTaskDelegate?) async throws -> (decoded: T, response: URLResponse)
+func fetchFile(_ url: URL, configuration: RequestConfiguration?, delegate: URLSessionTaskDelegate?) async throws -> (data: Data?, response: URLResponse)
+func downloadFile(_ url: URL, to localUrl: URL, configuration: RequestConfiguration?, delegate: URLSessionTaskDelegate?) async throws -> (result: Bool, response: URLResponse)
 ```
 
 **callbacks API**
