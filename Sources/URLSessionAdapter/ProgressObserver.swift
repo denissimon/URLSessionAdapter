@@ -9,7 +9,7 @@
 
 import Foundation
 
-open class ProgressObserver: NSObject, URLSessionDataDelegate, @unchecked Sendable {
+open class ProgressObserver: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
     
     var observation: NSKeyValueObservation? = nil
     let onChangeHandler: (Progress) -> Void

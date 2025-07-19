@@ -39,10 +39,10 @@ public struct RequestConfiguration: Sendable {
 public protocol NetworkServiceAsyncAwaitType: Sendable {
     var urlSession: URLSession { get }
     
-    func request(_ request: URLRequest, configuration: RequestConfiguration?, delegate: URLSessionDataDelegate?) async throws -> (data: Data, response: URLResponse)
-    func request<T: Decodable>(_ request: URLRequest, type: T.Type, configuration: RequestConfiguration?, delegate: URLSessionDataDelegate?) async throws -> (decoded: T, response: URLResponse)
-    func fetchFile(_ url: URL, configuration: RequestConfiguration?, delegate: URLSessionDataDelegate?) async throws -> (data: Data?, response: URLResponse)
-    func downloadFile(_ url: URL, to localUrl: URL, configuration: RequestConfiguration?, delegate: URLSessionDataDelegate?) async throws -> (result: Bool, response: URLResponse)
+    func request(_ request: URLRequest, configuration: RequestConfiguration?, delegate: URLSessionTaskDelegate?) async throws -> (data: Data, response: URLResponse)
+    func request<T: Decodable>(_ request: URLRequest, type: T.Type, configuration: RequestConfiguration?, delegate: URLSessionTaskDelegate?) async throws -> (decoded: T, response: URLResponse)
+    func fetchFile(_ url: URL, configuration: RequestConfiguration?, delegate: URLSessionTaskDelegate?) async throws -> (data: Data?, response: URLResponse)
+    func downloadFile(_ url: URL, to localUrl: URL, configuration: RequestConfiguration?, delegate: URLSessionTaskDelegate?) async throws -> (result: Bool, response: URLResponse)
 }
 
 public protocol NetworkServiceCallbacksType: Sendable {
@@ -95,7 +95,7 @@ final public class NetworkService: NetworkServiceType {
     
     // MARK: - async/await API
     
-    public func request(_ request: URLRequest, configuration: RequestConfiguration? = nil, delegate: URLSessionDataDelegate? = nil) async throws -> (data: Data, response: URLResponse) {
+    public func request(_ request: URLRequest, configuration: RequestConfiguration? = nil, delegate: URLSessionTaskDelegate? = nil) async throws -> (data: Data, response: URLResponse) {
         let isUploadTask = configuration?.uploadTask ?? defaultConfiguration.uploadTask
         
         var msg = "\nNetworkService request \(request.httpMethod ?? "")"
@@ -133,7 +133,7 @@ final public class NetworkService: NetworkServiceType {
         return (data, response)
     }
     
-    public func request<T: Decodable>(_ request: URLRequest, type: T.Type, configuration: RequestConfiguration? = nil, delegate: URLSessionDataDelegate? = nil) async throws -> (decoded: T, response: URLResponse) {
+    public func request<T: Decodable>(_ request: URLRequest, type: T.Type, configuration: RequestConfiguration? = nil, delegate: URLSessionTaskDelegate? = nil) async throws -> (decoded: T, response: URLResponse) {
         let isUploadTask = configuration?.uploadTask ?? defaultConfiguration.uploadTask
         
         var msg = "\nNetworkService request<T: Decodable> \(request.httpMethod ?? "")"
@@ -176,7 +176,7 @@ final public class NetworkService: NetworkServiceType {
     }
     
     /// Fetches a file into memory.
-    public func fetchFile(_ url: URL, configuration: RequestConfiguration? = nil, delegate: URLSessionDataDelegate? = nil) async throws -> (data: Data?, response: URLResponse) {
+    public func fetchFile(_ url: URL, configuration: RequestConfiguration? = nil, delegate: URLSessionTaskDelegate? = nil) async throws -> (data: Data?, response: URLResponse) {
         log("\nNetworkService fetchFile, url: \(url)")
         
         let (data, response) = try await urlSession.data(
@@ -196,7 +196,7 @@ final public class NetworkService: NetworkServiceType {
     }
     
     /// Downloads a file to disk. Supports background downloads.
-    public func downloadFile(_ url: URL, to localUrl: URL, configuration: RequestConfiguration? = nil, delegate: URLSessionDataDelegate? = nil) async throws -> (result: Bool, response: URLResponse) {
+    public func downloadFile(_ url: URL, to localUrl: URL, configuration: RequestConfiguration? = nil, delegate: URLSessionTaskDelegate? = nil) async throws -> (result: Bool, response: URLResponse) {
         log("\nNetworkService downloadFile, url: \(url), to: \(localUrl)")
         
         let (tempLocalUrl, response) = try await urlSession.download(
