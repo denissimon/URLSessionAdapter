@@ -21,7 +21,7 @@ To install URLSessionAdapter using [Swift Package Manager](https://swift.org/pac
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/denissimon/URLSessionAdapter.git", from: "2.2.7")
+    .package(url: "https://github.com/denissimon/URLSessionAdapter.git", from: "2.2.8")
 ]
 ```
 

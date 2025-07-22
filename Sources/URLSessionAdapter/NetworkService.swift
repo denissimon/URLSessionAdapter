@@ -9,7 +9,7 @@
 
 import Foundation
 
-public struct NetworkError: Error, Sendable {
+public struct NetworkError: Error {
     public let error: Error?
     public let statusCode: Int?
     public let data: Data?
