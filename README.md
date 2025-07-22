@@ -21,14 +21,14 @@ To install URLSessionAdapter using [Swift Package Manager](https://swift.org/pac
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/denissimon/URLSessionAdapter.git", from: "2.2.6")
+    .package(url: "https://github.com/denissimon/URLSessionAdapter.git", from: "2.2.7")
 ]
 ```
 
 Or through Xcode:
 
 ```txt
-Xcode: File -> Add Packages
+File -> Add Packages
 Enter Package URL: https://github.com/denissimon/URLSessionAdapter
 ```
 
@@ -247,7 +247,7 @@ do {
 
 ```swift
 let progressObserver = ProgressObserver {
-    print($0.fractionCompleted) // Outputs: 0.05 0.0595 1.0
+    print($0.fractionCompleted) // Example output: 0.05 0.0595 1.0
 }
     
 do {
@@ -267,18 +267,16 @@ More usage examples can be found in [tests](https://github.com/denissimon/URLSes
 Public methods
 --------------
 
-**async/await API**
-
 ```swift
+// async/await API
+
 func request(_ request: URLRequest, configuration: RequestConfiguration?, delegate: URLSessionTaskDelegate?) async throws -> (data: Data, response: URLResponse)
 func request<T: Decodable>(_ request: URLRequest, type: T.Type, configuration: RequestConfiguration?, delegate: URLSessionTaskDelegate?) async throws -> (decoded: T, response: URLResponse)
 func fetchFile(_ url: URL, configuration: RequestConfiguration?, delegate: URLSessionTaskDelegate?) async throws -> (data: Data?, response: URLResponse)
 func downloadFile(_ url: URL, to localUrl: URL, configuration: RequestConfiguration?, delegate: URLSessionTaskDelegate?) async throws -> (result: Bool, response: URLResponse)
-```
 
-**callbacks API**
+// callbacks API
 
-```swift
 func request(_ request: URLRequest, configuration: RequestConfiguration?, completion: @escaping @Sendable (Result<(data: Data?, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
 func request<T: Decodable>(_ request: URLRequest, type: T.Type, configuration: RequestConfiguration?, completion: @escaping @Sendable (Result<(decoded: T, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
 func fetchFile(_ url: URL, configuration: RequestConfiguration?, completion: @escaping @Sendable (Result<(data: Data?, response: URLResponse?), NetworkError>) -> Void) -> NetworkCancellable?
